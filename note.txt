@@ -1,0 +1,10 @@
+1. Lấy các thông tin từ fanpage theo keywords:
+- link page
+- tên page
+- địa chỉ
+- số điện thoại
+- web
+- mail
+- thời gian bài đăng gần nhất
+2. Các chức năng dừng, chạy tiếp, next từ khóa hoặc next link
+3. Có hỗ trợ tìm theo khu vực, tuổi hoặc lĩnh vực
