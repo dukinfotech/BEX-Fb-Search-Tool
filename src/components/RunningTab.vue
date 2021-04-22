@@ -1,7 +1,8 @@
 <template>
   <div>
     <div class="control-btns">
-      <q-btn class="control-btn" color="primary" label="Bắt đầu" @click="start()"/>
+      <q-btn v-if="!isRunning" class="control-btn" color="primary" label="Bắt đầu" @click="start()"/>
+      <q-btn v-else class="control-btn" color="negative" label="Dừng" @click="stop()"/>
       <q-btn class="control-btn" color="primary" label="Reset" />
       <q-btn class="control-btn" color="primary" label="<" />
       <q-btn class="control-btn" color="primary" label=">" />
@@ -14,6 +15,7 @@
       Địa điểm: 
       <span v-bind:key="index" v-for="(item, index) in locations">{{ index==0?'':', ' }}{{ item.city }}</span>
     </div>
+    <q-linear-progress v-if="isRunning" query color="warning" class="q-mt-sm" />
   </div>
 </template>
 
@@ -22,6 +24,9 @@ import { transformFilter, makeURL } from 'app/src/helpers'
 
 export default {
   computed: {
+    isRunning() {
+      return this.$store.state.running.isRunning;
+    },
     locations() {
       return this.$store.state.setting.locations;
     },
@@ -40,6 +45,9 @@ export default {
       return this.$store.state.setting.keywords
     }
   },
+  updated() {
+    this.$q.bex.send('isRunning', { isRunning: this.isRunning });
+  },
   methods: {
     start() {
       if (!this.keyword) {
@@ -55,15 +63,18 @@ export default {
           filters.push(locationFilter);
         }
         var url = makeURL(filters, this.keyword);
-        this.$q.bex.send('fb.redirect', { url: url })
+        this.$store.commit('running/setRunning', true);
+        this.$q.bex.send('fb.redirect', { url: url });
       }
+    },
+    stop() {
+      this.$store.commit('running/setRunning', false);
+      this.$q.bex.send('isRunning', { isRunning: this.isRunning });
     }
   }
 }
 
 </script>
-
-
 
 <style scoped>
   .control-btns {

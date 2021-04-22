@@ -6,6 +6,7 @@ const setIFrameSize = (height, width) => {
   iFrame.width = width
 }
 
+
 export default function attachContentHooks (bridge) {
   bridge.on('wb.drawer.toggle', event => {
     const payload = event.data
@@ -19,10 +20,34 @@ export default function attachContentHooks (bridge) {
 
   bridge.on('fb.redirect', event => {
     const payload = event.data
-    console.log(payload.url);
     window.location.href = payload.url
-  })
-} 
+  });
+
+  window.onload = function () {
+    bridge.on('isRunning', event => {
+      const payload = event.data
+      if (payload.isRunning) {
+        scrollToBottom();
+      } else {
+        var x = getIntervalIds();
+        x.forEach(id => clearInterval(id));
+      }
+    })
+  }
+}
+
+var intervalIds = [];
+
+function getIntervalIds() {
+  return intervalIds;
+}
+
+function scrollToBottom () {
+  var intervalId = setInterval(function() {
+    window.scrollTo(0, document.body.scrollHeight);
+  }, 1000);
+  intervalIds.push(intervalId);
+}
 
 setIFrameSize('100%', '600px');
 

@@ -13,11 +13,6 @@ export function setKeys (state, keys) {
   storeSettings(state)
 }
 
-export function setAccessToken (state, token) {
-  state.accessToken = token
-  storeSettings(state)
-}
-
 export function setLocations (state, locations) {
   state.locations = locations
   storeSettings(state)
@@ -33,7 +28,6 @@ function storeSettings(state) {
 }
 
 export function clearSettings(state) {
-  state.accessToken =  null;
   state.keywords = [];
   state.locations = [];
   state.category = null;

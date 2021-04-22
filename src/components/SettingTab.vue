@@ -3,12 +3,6 @@
     <div>
       <q-btn color="red" label="Xóa cache" @click="deleteData()"/>
     </div>
-    <div class="row mt-10">
-      <a href="https://developers.facebook.com/tools/explorer/" target="_blank">
-        <q-btn title="Lấy token" color="primary" icon="facebook" />
-      </a>
-      <q-input class="col" filled v-model="accessToken" label="Access Token" stack-label dense/>
-    </div>
     <div class="mt-10">
       <q-select
         dense
@@ -40,14 +34,6 @@ export default {
     }
   },
   computed: {
-    accessToken: {
-      get() {
-        return this.$store.state.setting.accessToken;
-      },
-      set(val) {
-        this.$store.commit('setting/setAccessToken', val)
-      }
-    },
     category: {
       get() {
         return this.$store.state.setting.category ? this.$store.state.setting.category.label : null

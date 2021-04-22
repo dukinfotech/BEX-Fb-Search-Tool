@@ -36,8 +36,6 @@ export default function attachBackgroundHooks (bridge /* , allActiveConnections 
       bridge.send(event.eventResponseKey, payload.data)
     })
   })
-
-
   /*
   // EXAMPLES
   // Listen to a message from the client

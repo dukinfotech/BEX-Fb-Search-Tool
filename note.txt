@@ -8,3 +8,18 @@
 - thời gian bài đăng gần nhất
 2. Các chức năng dừng, chạy tiếp, next từ khóa hoặc next link
 3. Có hỗ trợ tìm theo khu vực, tuổi hoặc lĩnh vực
+
+------------------------
+Yêu cầu cho API Search for a Page
+- User Access Token và App Secret (nếu app user đã được đăng nhập vào FB)
+- App Access Token Page Public Metadata Access feature (nếu app user chưa đăng nhập vào FB)
+    => Lấy public page infomation
+- App Access Token Page Public Content Access feature (nếu app user chưa đăng nhập vào FB)
+    => Để conduct competitve analysis.
+https://graph.facebook.com/pages/search?q=Facebook&fields=id,name,location,link&access_token={access-token}
+
+
+* Page Public Metadata
+- Cho phép Pages Search API
+=> Cần App Review
+   business verification.
