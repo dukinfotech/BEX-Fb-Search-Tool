@@ -50,7 +50,7 @@ export default {
         return this.$store.state.setting.keywords
       },
       set() {
-        this.$store.commit('running/resetKey')
+        this.$store.commit('running/setKey', '')
       }
     }
   },

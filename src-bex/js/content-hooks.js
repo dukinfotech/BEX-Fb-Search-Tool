@@ -27,26 +27,31 @@ export default function attachContentHooks (bridge) {
     bridge.on('isRunning', event => {
       const payload = event.data
       if (payload.isRunning) {
-        scrollToBottom();
-      } else {
-        var x = getIntervalIds();
-        x.forEach(id => clearInterval(id));
+        // Auto scroll to bottom
+        const endScrollText1 = 'Kết quả tìm kiếm chỉ bao gồm những nội dung hiển thị với bạn.';
+        const endScrollText2 = 'Search results only include things visible to you.';
+        const endScrollText3 = 'End of Results';
+        const endScrollText4 = 'Đã hết kết quả';
+        const endScrollText5 = "We didn't find any results";
+        const endScrollText6 = 'Chúng tôi không tìm thấy kết quả nào';
+        
+        var scrollInfinitely = setInterval(function () {
+          window.scrollTo(0, document.body.scrollHeight);
+          var bodyTagText = document.body.innerText;
+          if (bodyTagText.includes(endScrollText1) || 
+              bodyTagText.includes(endScrollText2) ||
+              bodyTagText.includes(endScrollText3) ||
+              bodyTagText.includes(endScrollText4) ||
+              bodyTagText.includes(endScrollText5) ||
+              bodyTagText.includes(endScrollText6)) {
+            console.log('Stop auto scroll');
+            clearInterval(scrollInfinitely);
+            bridge.send(event.eventResponseKey);
+          }
+        }, 1000);
       }
     })
   }
-}
-
-var intervalIds = [];
-
-function getIntervalIds() {
-  return intervalIds;
-}
-
-function scrollToBottom () {
-  var intervalId = setInterval(function() {
-    window.scrollTo(0, document.body.scrollHeight);
-  }, 1000);
-  intervalIds.push(intervalId);
 }
 
 setIFrameSize('100%', '600px');

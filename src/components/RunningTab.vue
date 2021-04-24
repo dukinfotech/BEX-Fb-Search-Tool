@@ -46,7 +46,9 @@ export default {
     }
   },
   updated() {
-    this.$q.bex.send('isRunning', { isRunning: this.isRunning });
+    this.$q.bex.send('isRunning', { isRunning: this.isRunning }).then(res => {
+      this.$store.commit('running/setRunning', false);
+    });
   },
   methods: {
     start() {
