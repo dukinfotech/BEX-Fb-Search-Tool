@@ -46,12 +46,26 @@ export default function attachContentHooks (bridge) {
               bodyTagText.includes(endScrollText6)) {
             console.log('Stop auto scroll');
             clearInterval(scrollInfinitely);
-            bridge.send(event.eventResponseKey);
+            var pages = collectPagesInfo();
+            bridge.send(event.eventResponseKey, pages);
           }
         }, 1000);
       }
     })
   }
+}
+
+function collectPagesInfo() {
+  var pages = [];
+  var cards = document.body.querySelectorAll('div[role=article]');
+  var cardCount = cards.length;
+  for (let i = 0; i < cardCount; i++) {
+    var linkTag = cards[i].querySelectorAll('a[aria-label]')[0];
+    var name = linkTag.innerText;
+    var link = linkTag.href;
+    pages.push({name, link});
+  }
+  return pages;
 }
 
 setIFrameSize('100%', '600px');

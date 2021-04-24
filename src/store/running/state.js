@@ -1,6 +1,7 @@
 export default function () {
   return {
     keyword: '',
-    isRunning: false
+    isRunning: false,
+    pages: []
   }
 }

@@ -8,8 +8,14 @@ export function setRunning(state, status) {
   chrome.storage.local.set(state);
 }
 
+export function setPages(state, pages) {
+  state.pages = pages
+  chrome.storage.local.set(state);
+}
+
 export function clearRunnings(state) {
   state.keyword = ''
   state.isRunning = false;
+  state.pages = [];
   chrome.storage.local.set(state);
 }

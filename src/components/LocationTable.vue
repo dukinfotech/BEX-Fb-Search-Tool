@@ -1,5 +1,7 @@
 <template>
   <q-table
+    dense
+    :pagination.sync="pagination"
     :bordered="false"
     title="Địa điểm"
     :data="data"
@@ -29,6 +31,9 @@ export default {
   },
   data () {
     return {
+      pagination: {
+        rowsPerPage: 15
+      },
       columns: [
         { name: 'city', align: 'left', label: 'Thành phố', field: 'city', sortable: true },
         { name: 'code', align: 'center', label: 'Code', field: 'code' }

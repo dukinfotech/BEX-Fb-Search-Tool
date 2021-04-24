@@ -16,13 +16,16 @@
       <span v-bind:key="index" v-for="(item, index) in locations">{{ index==0?'':', ' }}{{ item.city }}</span>
     </div>
     <q-linear-progress v-if="isRunning" query color="warning" class="q-mt-sm" />
+    <page-table style="margin-top:10px"/>
   </div>
 </template>
 
 <script>
 import { transformFilter, makeURL } from 'app/src/helpers'
+import PageTable from './PageTable.vue'
 
 export default {
+  components: { PageTable },
   computed: {
     isRunning() {
       return this.$store.state.running.isRunning;
@@ -47,6 +50,8 @@ export default {
   },
   updated() {
     this.$q.bex.send('isRunning', { isRunning: this.isRunning }).then(res => {
+      var pages = res.data;
+      this.$store.commit('running/setPages', pages);
       this.$store.commit('running/setRunning', false);
     });
   },
