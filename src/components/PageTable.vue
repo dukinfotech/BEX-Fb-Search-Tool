@@ -34,6 +34,7 @@ export default {
         { name: 'textLink', align: 'left', label: 'Link', field: 'textLink' },
         { name: 'firstPostTime', align: 'left', label: 'Bài đăng gần nhất', field: 'firstPostTime' },
         { name: 'phone', align: 'left', label: 'SĐT', field: 'phone' },
+        { name: 'website', align: 'left', label: 'Website', field: 'website' },
         { name: 'email', align: 'left', label: 'Email', field: 'email' },
         { name: 'address', align: 'left', label: 'Địa chỉ', field: 'address' },
       ]
