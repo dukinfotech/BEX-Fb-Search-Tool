@@ -3,6 +3,7 @@ export default function () {
     keyword: '',
     isRunning: false,
     pages: [],
-    pageIndex: null
+    pageIndex: null,
+    isSearching: false,
   }
 }

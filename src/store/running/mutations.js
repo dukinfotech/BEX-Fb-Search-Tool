@@ -13,8 +13,25 @@ export function setPages(state, pages) {
   chrome.storage.local.set(state);
 }
 
+export function updatePages(state, data) {
+  var index = data.index;
+  var page = data.value;
+  state.pages[index].name = page.name;
+  state.pages[index].firstPostTime = page.firstPostTime;
+  state.pages[index].website = page.website;
+  state.pages[index].phone = page.phone;
+  state.pages[index].email = page.email;
+  state.pages[index].address = page.address;
+  chrome.storage.local.set(state);
+}
+
 export function setPageIndex(state, index) {
   state.pageIndex = index
+  chrome.storage.local.set(state);
+}
+
+export function setIsSearching(state, status) {
+  state.isSearching = status
   chrome.storage.local.set(state);
 }
 
@@ -22,5 +39,7 @@ export function clearRunnings(state) {
   state.keyword = ''
   state.isRunning = false;
   state.pages = [];
+  state.pageIndex = null;
+  state.isSearching = false;
   chrome.storage.local.set(state);
 }

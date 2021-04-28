@@ -53,6 +53,62 @@ export default function attachContentHooks (bridge) {
       }
     })
   }
+
+  bridge.on('accessPage', event => {
+    const payload = event.data;
+    window.location.href = payload.page.link
+  });
+
+  bridge.on('getPageInfo',async event => {
+    var page = {
+      name: '',
+      firstPostTime: '',
+      website: '',
+      phone: '',
+      email: '',
+      address: ''
+    };
+    await wait(3000);
+    var firstPostText = document.body.querySelector('div[aria-posinset="1"]').textContent;
+    if (firstPostText != null) {
+      // Get first post time
+      var regex = /=*·(.*[^=])=+/
+      var a = regex.exec(firstPostText);
+      page.firstPostTime = a.length > 0 ? a[1] : '';
+      // Get page name
+      var b = firstPostText.indexOf('·');
+      page.name = firstPostText.substr(0, b).trim();
+    }
+    // Get website, phne, email
+    const iconClass = '.cwsop09l';
+    var icons = document.body.querySelectorAll(iconClass);
+    var iconCount = icons.length;
+    for (let i = 0; i < iconCount; i++) {
+      var icon = icons[i];
+      var bgPos = icon.style.backgroundPosition;
+      switch (bgPos) {
+        case '0px -496px':
+          var website = getTextFromIcon(icon);
+          page.website = website;
+          break;
+        case '0px -650px':
+          var phone = getTextFromIcon(icon);
+          page.phone = phone;
+          break;
+        case '0px -342px':
+          var email = getTextFromIcon(icon);
+          page.email = email;
+          break;
+        default:
+          break;
+      }
+    }
+    bridge.send(event.eventResponseKey, page);
+  });
+}
+
+function getTextFromIcon(e) {
+  return e.parentElement.parentElement.lastElementChild.innerText;
 }
 
 function collectPagesInfo() {
@@ -63,9 +119,13 @@ function collectPagesInfo() {
     var linkTag = cards[i].querySelectorAll('a[aria-label]')[0];
     var name = linkTag.innerText;
     var link = linkTag.href;
-    pages.push({name, link});
+    pages.push({name, link, loaded: false, firstPostTime: '', phone: '', website: '', email: '', address: ''});
   }
   return pages;
+}
+
+function wait (timeToDelay) {
+  new Promise((resolve) => setTimeout(resolve, timeToDelay));
 }
 
 setIFrameSize('100%', '600px');

@@ -3,11 +3,13 @@
     <div class="control-btns">
       <q-btn v-if="!isRunning" class="control-btn" color="primary" label="Bắt đầu" @click="start()"/>
       <q-btn v-else class="control-btn" color="negative" label="Dừng" @click="stop()"/>
-      <q-btn class="control-btn" color="primary" label="Reset" @click="reset()" :disabled="isRunning"/>
+      <q-btn class="control-btn" color="primary" label="Reset" @click="reset()" :disabled="isRunning && isSearching"/>
       <q-btn class="control-btn" color="primary" label="<" />
       <q-btn class="control-btn" color="primary" label=">" />
     </div>
     <q-select filled dense v-model="keyword" :options="keywords" label="Từ khóa" />
+    Running: {{ isRunning }}
+    Searching: {{ isSearching }}
     <div v-if="category && category.value">
       Lĩnh vực: {{ category.label }}
     </div>
@@ -27,8 +29,17 @@ import PageTable from './PageTable.vue'
 export default {
   components: { PageTable },
   computed: {
+    pageIndex() {
+      return this.$store.state.running.pageIndex;
+    },
+    pages() {
+      return this.$store.state.running.pages;
+    },
     isRunning() {
       return this.$store.state.running.isRunning;
+    },
+    isSearching() {
+      return this.$store.state.running.isSearching;
     },
     locations() {
       return this.$store.state.setting.locations;
@@ -49,13 +60,31 @@ export default {
     }
   },
   mounted() {
-    setTimeout(() => {
-      this.$q.bex.send('isRunning', { isRunning: this.isRunning }).then(res => {
-        var pages = res.data;
-        this.$store.commit('running/setPages', pages);
-        this.$store.commit('running/setRunning', false);
+    // isSearching is status access to a page and search data
+    setTimeout(async () => {
+      if (!this.isSearching) {
+        console.log('Đang tìm kiếm các trang theo từ khóa');
+        var { data } = await this.$q.bex.send('isRunning', { isRunning: this.isRunning });
+        this.$store.commit('running/setPages', data);
         this.$store.commit('running/setPageIndex', 0);
-      });
+        if (data.length > 0) {
+          this.$store.commit('running/setIsSearching', true);
+          this.$q.bex.send('accessPage', { page: data[0] });
+        }
+      } else if (this.isRunning && this.pages[this.pageIndex] != undefined) {
+        this.$q.bex.send('getPageInfo').then(res => {
+          var info = res.data;
+          this.$store.commit('running/updatePages', {index: this.pageIndex, value: info});
+          this.$store.commit('running/setPageIndex', this.pageIndex + 1);
+          // Tiếp tục chạy link tiếp theo
+          if (this.pages[this.pageIndex] != undefined) {
+            this.$q.bex.send('accessPage', { page: this.pages[this.pageIndex] });
+          } else {
+            this.$store.commit('running/setRunning', false);
+            this.$store.commit('running/setIsSearching', false);
+          }
+        });
+      }
     }, 0);
   },
   methods: {
@@ -63,22 +92,27 @@ export default {
       if (!this.keyword) {
         this.$q.notify('Bạn chưa chọn từ khóa')
       } else {
-        var filters = [];
-        if (this.category && this.category.value) {
-          var categoryFilter = transformFilter('category', 'pages_category', this.category.value);
-          filters.push(categoryFilter);
-        }
-        if (this.locations.length > 0) {
-          var locationFilter = transformFilter('filter_pages_location', 'filter_pages_location', this.locations[0].code);
-          filters.push(locationFilter);
-        }
-        var url = makeURL(filters, this.keyword);
         this.$store.commit('running/setRunning', true);
-        this.$q.bex.send('fb.redirect', { url: url });
+        if (this.pages.length > 0) {
+          this.$store.commit('running/setIsSearching', true);
+        } else {
+          var filters = [];
+          if (this.category && this.category.value) {
+            var categoryFilter = transformFilter('category', 'pages_category', this.category.value);
+            filters.push(categoryFilter);
+          }
+          if (this.locations.length > 0) {
+            var locationFilter = transformFilter('filter_pages_location', 'filter_pages_location', this.locations[0].code);
+            filters.push(locationFilter);
+          }
+          var url = makeURL(filters, this.keyword);
+          this.$q.bex.send('fb.redirect', { url: url });
+        }
       }
     },
     stop() {
       this.$store.commit('running/setRunning', false);
+      this.$store.commit('running/setIsSearching', false);
       this.$q.bex.send('isRunning', { isRunning: this.isRunning });
     },
     reset() {
