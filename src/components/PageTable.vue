@@ -17,6 +17,7 @@ export default {
     pages() {
       var pages = this.$store.state.running.pages;
       pages.forEach((row, index) => {
+        console.log(row.link);
         row.index = index+1;
         row.textLink = row.link.substring(20, 60);
       })

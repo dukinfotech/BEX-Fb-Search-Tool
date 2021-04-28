@@ -60,48 +60,53 @@ export default function attachContentHooks (bridge) {
   });
 
   bridge.on('getPageInfo',async event => {
-    var page = {
-      name: '',
-      firstPostTime: '',
-      website: '',
-      phone: '',
-      email: '',
-      address: ''
-    };
-    await wait(3000);
-    var firstPostText = document.body.querySelector('div[aria-posinset="1"]').textContent;
-    if (firstPostText != null) {
+    try {
+      var page = {
+        name: '',
+        firstPostTime: '',
+        website: '',
+        phone: '',
+        email: '',
+        address: ''
+      };
+      await wait(3000);
+      var firstPostCard = document.body.querySelector('div[aria-posinset="1"]');
+
       // Get first post time
-      var regex = /=*·(.*[^=])=+/
-      var a = regex.exec(firstPostText);
-      page.firstPostTime = a.length > 0 ? a[1] : '';
-      // Get page name
-      var b = firstPostText.indexOf('·');
-      page.name = firstPostText.substr(0, b).trim();
-    }
-    // Get website, phne, email
-    const iconClass = '.cwsop09l';
-    var icons = document.body.querySelectorAll(iconClass);
-    var iconCount = icons.length;
-    for (let i = 0; i < iconCount; i++) {
-      var icon = icons[i];
-      var bgPos = icon.style.backgroundPosition;
-      switch (bgPos) {
-        case '0px -496px':
-          var website = getTextFromIcon(icon);
-          page.website = website;
-          break;
-        case '0px -650px':
-          var phone = getTextFromIcon(icon);
-          page.phone = phone;
-          break;
-        case '0px -342px':
-          var email = getTextFromIcon(icon);
-          page.email = email;
-          break;
-        default:
-          break;
+      var bTags = firstPostCard.querySelectorAll('b');
+      for (let i = 0; i < bTags.length; i++) {
+        if (bTags[i].style.display != 'none') {
+          page.firstPostTime = bTags[i].textContent;
+        }
       }
+      // Get page name
+      page.name = firstPostCard.querySelector('strong').textContent
+      // Get website, phne, email
+      const iconClass = '.cwsop09l';
+      var icons = document.body.querySelectorAll(iconClass);
+      var iconCount = icons.length;
+      for (let i = 0; i < iconCount; i++) {
+        var icon = icons[i];
+        var bgPos = icon.style.backgroundPosition;
+        switch (bgPos) {
+          case '0px -496px':
+            var website = getTextFromIcon(icon);
+            page.website = website;
+            break;
+          case '0px -650px':
+            var phone = getTextFromIcon(icon);
+            page.phone = phone;
+            break;
+          case '0px -342px':
+            var email = getTextFromIcon(icon);
+            page.email = email;
+            break;
+          default:
+            break;
+        }
+      } 
+    } catch (error) {
+      console.error(error);
     }
     bridge.send(event.eventResponseKey, page);
   });
@@ -124,8 +129,8 @@ function collectPagesInfo() {
   return pages;
 }
 
-function wait (timeToDelay) {
-  new Promise((resolve) => setTimeout(resolve, timeToDelay));
+async function wait (timeToDelay) {
+  return new Promise((resolve) => setTimeout(resolve, timeToDelay));
 }
 
 setIFrameSize('100%', '600px');
