@@ -13,7 +13,7 @@
     <!-- Running: {{ isRunning }}
     Searching: {{ isSearching }} -->
     <div v-if="pageIndex!=null">
-      Đang lấy dữ liệu #{{ pageIndex + 1 }}
+      {{ isRunning ? 'Đang' : 'Đã' }} lấy dữ liệu #{{ isRunning ? pageIndex + 1 : pageIndex }}
     </div>
     <div v-if="category && category.value">
       Lĩnh vực: {{ category.label }}
