@@ -5,5 +5,6 @@ export default function () {
     pages: [],
     pageIndex: null,
     isSearching: false,
+    currentLocationIndex: 0
   }
 }

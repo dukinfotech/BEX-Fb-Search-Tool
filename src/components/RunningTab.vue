@@ -4,8 +4,10 @@
       <q-btn v-if="!isRunning" class="control-btn" color="primary" label="Bắt đầu" @click="start()"/>
       <q-btn v-else class="control-btn" color="negative" label="Dừng" @click="stop()"/>
       <q-btn class="control-btn" color="primary" label="Reset" @click="reset()" :disabled="isRunning && isSearching"/>
-      <q-btn class="control-btn" color="primary" label="<" />
-      <q-btn class="control-btn" color="primary" label=">" />
+      <q-btn class="control-btn" color="primary" label="<" 
+        :disabled="locations.length == 0 || currentLocationIndex == 0 || isRunning" @click="prevLocation()"/>
+      <q-btn class="control-btn" color="primary" label=">" 
+        :disabled="locations.length == 0 || currentLocationIndex == locations.length-1 || isRunning" @click="nextLocation()"/>
     </div>
     <q-select filled dense v-model="keyword" :options="keywords" label="Từ khóa" />
     Running: {{ isRunning }}
@@ -15,7 +17,9 @@
     </div>
     <div v-if="locations.length > 0">
       Địa điểm: 
-      <span v-bind:key="index" v-for="(item, index) in locations">{{ index==0?'':', ' }}{{ item.city }}</span>
+      <span v-bind:key="index" v-for="(item, index) in locations">
+        <span :class="index==currentLocationIndex?'text-negative':''">{{ item.city }}</span>,&nbsp;
+      </span>
     </div>
     <q-linear-progress v-if="isRunning" query color="warning" class="q-mt-sm" />
     <page-table style="margin-top:10px"/>
@@ -29,6 +33,9 @@ import PageTable from './PageTable.vue'
 export default {
   components: { PageTable },
   computed: {
+    currentLocationIndex() {
+      return this.$store.state.running.currentLocationIndex;
+    },
     pageIndex() {
       return this.$store.state.running.pageIndex;
     },
@@ -104,7 +111,7 @@ export default {
           filters.push(categoryFilter);
         }
         if (this.locations.length > 0) {
-          var locationFilter = transformFilter('filter_pages_location', 'filter_pages_location', this.locations[0].code);
+          var locationFilter = transformFilter('filter_pages_location', 'filter_pages_location', this.locations[this.currentLocationIndex].code);
           filters.push(locationFilter);
         }
         var url = makeURL(filters, this.keyword);
@@ -119,6 +126,12 @@ export default {
     reset() {
       this.$store.commit('running/setPages', []);
       this.$store.commit('running/setPageIndex', null);
+    },
+    prevLocation() {
+      this.$store.commit('running/setCurrentLocationIndex', -1);
+    },
+    nextLocation() {
+      this.$store.commit('running/setCurrentLocationIndex', 1);
     }
   }
 }
