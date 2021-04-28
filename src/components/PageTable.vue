@@ -8,12 +8,19 @@
     :pagination.sync="pagination"
     row-key="index"
   >
+    <template v-slot:top>
+      <q-btn color="positive" label="Import" :disabled="isRunning"/>
+      <q-btn class="q-ml-sm" color="pink-14" label="Export" :disabled="isRunning || pages.length == 0"/>
+    </template>
   </q-table>
 </template>
 
 <script>
 export default {
   computed: {
+    isRunning() {
+      return this.$store.state.running.isRunning;
+    },
     pages() {
       var pages = this.$store.state.running.pages;
       pages.forEach((row, index) => {
