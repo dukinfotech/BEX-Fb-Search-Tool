@@ -12,6 +12,9 @@
     <q-select filled dense v-model="keyword" :options="keywords" label="Từ khóa" />
     <!-- Running: {{ isRunning }}
     Searching: {{ isSearching }} -->
+    <div v-if="pageIndex!=null">
+      Đang lấy dữ liệu #{{ pageIndex + 1 }}
+    </div>
     <div v-if="category && category.value">
       Lĩnh vực: {{ category.label }}
     </div>
