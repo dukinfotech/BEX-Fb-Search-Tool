@@ -23,3 +23,6 @@ https://graph.facebook.com/pages/search?q=Facebook&fields=id,name,location,link&
 - Cho phép Pages Search API
 => Cần App Review
    business verification.
+
+Card của bài viết đầu tiên
+document.body.querySelectorAll('div[aria-posinset="1"]')[0];

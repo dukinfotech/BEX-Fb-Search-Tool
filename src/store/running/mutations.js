@@ -13,6 +13,11 @@ export function setPages(state, pages) {
   chrome.storage.local.set(state);
 }
 
+export function setPageIndex(state, index) {
+  state.pageIndex = index
+  chrome.storage.local.set(state);
+}
+
 export function clearRunnings(state) {
   state.keyword = ''
   state.isRunning = false;

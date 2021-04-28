@@ -3,7 +3,7 @@
     <div class="control-btns">
       <q-btn v-if="!isRunning" class="control-btn" color="primary" label="Bắt đầu" @click="start()"/>
       <q-btn v-else class="control-btn" color="negative" label="Dừng" @click="stop()"/>
-      <q-btn class="control-btn" color="primary" label="Reset" />
+      <q-btn class="control-btn" color="primary" label="Reset" @click="reset()" :disabled="isRunning"/>
       <q-btn class="control-btn" color="primary" label="<" />
       <q-btn class="control-btn" color="primary" label=">" />
     </div>
@@ -48,12 +48,15 @@ export default {
       return this.$store.state.setting.keywords
     }
   },
-  updated() {
-    this.$q.bex.send('isRunning', { isRunning: this.isRunning }).then(res => {
-      var pages = res.data;
-      this.$store.commit('running/setPages', pages);
-      this.$store.commit('running/setRunning', false);
-    });
+  mounted() {
+    setTimeout(() => {
+      this.$q.bex.send('isRunning', { isRunning: this.isRunning }).then(res => {
+        var pages = res.data;
+        this.$store.commit('running/setPages', pages);
+        this.$store.commit('running/setRunning', false);
+        this.$store.commit('running/setPageIndex', 0);
+      });
+    }, 0);
   },
   methods: {
     start() {
@@ -77,6 +80,10 @@ export default {
     stop() {
       this.$store.commit('running/setRunning', false);
       this.$q.bex.send('isRunning', { isRunning: this.isRunning });
+    },
+    reset() {
+      this.$store.commit('running/setPages', []);
+      this.$store.commit('running/setPageIndex', null);
     }
   }
 }
