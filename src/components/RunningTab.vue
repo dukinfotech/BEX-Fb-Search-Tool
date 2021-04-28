@@ -132,7 +132,7 @@ export default {
       this.$store.commit('running/setCurrentLocationIndex', this.currentLocationIndex-1);
     },
     nextLocation() {
-      this.$store.commit('running/setCurrentLocationIndex', this.setCurrentLocationIndex+1);
+      this.$store.commit('running/setCurrentLocationIndex', this.currentLocationIndex+1);
     }
   }
 }
