@@ -62,16 +62,21 @@ export default {
   mounted() {
     // isSearching is status access to a page and search data
     setTimeout(async () => {
-      if (!this.isSearching) {
+      if (this.isSearching === false) {
         console.log('Đang tìm kiếm các trang theo từ khóa');
+        // Lấy danh sách các pages tìm kiếm được
         var { data } = await this.$q.bex.send('isRunning', { isRunning: this.isRunning });
-        this.$store.commit('running/setPages', data);
-        this.$store.commit('running/setPageIndex', 0);
-        if (data.length > 0) {
+        if (data.length > 0) {  
+          this.$store.commit('running/mergePages', data);
+          console.log('pageindex', this.pageIndex);
+          this.$store.commit('running/setPageIndex', this.pageIndex || 0);
           this.$store.commit('running/setIsSearching', true);
-          this.$q.bex.send('accessPage', { page: data[0] });
+          this.$q.bex.send('accessPage', { page: this.pages[this.pageIndex] });
+        } else {
+          this.stop();
         }
       } else if (this.isRunning && this.pages[this.pageIndex] != undefined) {
+        // Truy cập vào từng trang web
         this.$q.bex.send('getPageInfo').then(res => {
           var info = res.data;
           this.$store.commit('running/updatePages', {index: this.pageIndex, value: info});
@@ -93,21 +98,17 @@ export default {
         this.$q.notify('Bạn chưa chọn từ khóa')
       } else {
         this.$store.commit('running/setRunning', true);
-        if (this.pages.length > 0) {
-          this.$store.commit('running/setIsSearching', true);
-        } else {
-          var filters = [];
-          if (this.category && this.category.value) {
-            var categoryFilter = transformFilter('category', 'pages_category', this.category.value);
-            filters.push(categoryFilter);
-          }
-          if (this.locations.length > 0) {
-            var locationFilter = transformFilter('filter_pages_location', 'filter_pages_location', this.locations[0].code);
-            filters.push(locationFilter);
-          }
-          var url = makeURL(filters, this.keyword);
-          this.$q.bex.send('fb.redirect', { url: url });
+        var filters = [];
+        if (this.category && this.category.value) {
+          var categoryFilter = transformFilter('category', 'pages_category', this.category.value);
+          filters.push(categoryFilter);
         }
+        if (this.locations.length > 0) {
+          var locationFilter = transformFilter('filter_pages_location', 'filter_pages_location', this.locations[0].code);
+          filters.push(locationFilter);
+        }
+        var url = makeURL(filters, this.keyword);
+        this.$q.bex.send('fb.redirect', { url: url });
       }
     },
     stop() {

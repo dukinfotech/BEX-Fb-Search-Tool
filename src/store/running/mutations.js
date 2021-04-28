@@ -13,6 +13,11 @@ export function setPages(state, pages) {
   chrome.storage.local.set(state);
 }
 
+export function mergePages(state, pages) {
+  state.pages = state.pages.concat(pages)
+  chrome.storage.local.set(state);
+}
+
 export function updatePages(state, data) {
   var index = data.index;
   var page = data.value;
