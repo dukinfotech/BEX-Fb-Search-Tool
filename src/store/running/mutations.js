@@ -51,6 +51,6 @@ export function clearRunnings(state) {
 }
 
 export function setCurrentLocationIndex(state, x) {
-  state.currentLocationIndex = state.currentLocationIndex + x;
+  state.currentLocationIndex = x;
   chrome.storage.local.set(state);
 }

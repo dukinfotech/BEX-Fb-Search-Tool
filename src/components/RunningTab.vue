@@ -10,8 +10,8 @@
         :disabled="locations.length == 0 || currentLocationIndex == locations.length-1 || isRunning" @click="nextLocation()"/>
     </div>
     <q-select filled dense v-model="keyword" :options="keywords" label="Từ khóa" />
-    Running: {{ isRunning }}
-    Searching: {{ isSearching }}
+    <!-- Running: {{ isRunning }}
+    Searching: {{ isSearching }} -->
     <div v-if="category && category.value">
       Lĩnh vực: {{ category.label }}
     </div>
@@ -126,12 +126,13 @@ export default {
     reset() {
       this.$store.commit('running/setPages', []);
       this.$store.commit('running/setPageIndex', null);
+      this.$store.commit('running/setCurrentLocationIndex', 0);
     },
     prevLocation() {
-      this.$store.commit('running/setCurrentLocationIndex', -1);
+      this.$store.commit('running/setCurrentLocationIndex', this.currentLocationIndex-1);
     },
     nextLocation() {
-      this.$store.commit('running/setCurrentLocationIndex', 1);
+      this.$store.commit('running/setCurrentLocationIndex', this.setCurrentLocationIndex+1);
     }
   }
 }

@@ -79,9 +79,14 @@ export default function attachContentHooks (bridge) {
           page.firstPostTime = bTags[i].textContent;
         }
       }
+      // Get address
+      var mapDiv = document.body.querySelector('span[style*="-webkit-box-orient: vertical; -webkit-line-clamp: 5; display: -webkit-box;"]');
+      if (mapDiv) {
+        page.address = mapDiv.textContent;
+      }
       // Get page name
       page.name = firstPostCard.querySelector('strong').textContent
-      // Get website, phne, email
+      // Get website, phone, email
       const iconClass = '.cwsop09l';
       var icons = document.body.querySelectorAll(iconClass);
       var iconCount = icons.length;
