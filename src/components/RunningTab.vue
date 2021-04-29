@@ -13,7 +13,7 @@
     Running: {{ isRunning }}
     Loading: {{ isSearching }}
     <div v-if="pages.length > 0">
-      {{ isRunning ? 'Đang' : 'Đã' }} lấy dữ liệu #{{ isRunning ? pageIndex + 1 : pageIndex }}
+      {{ 'Đang lấy dữ liệu #' + (pageIndex + 1) }}
     </div>
     <div v-if="category && category.value">
       Lĩnh vực: {{ category.label }}
@@ -95,7 +95,7 @@ export default {
       if (this.pages.length > 0) {
         this.$store.commit('running/setRunning', true);
         this.$store.commit('running/setIsSearching', true);
-        this.autoAccessPage();
+        this.$q.bex.send('accessPage', { page: this.pages[this.pageIndex] });
       } else {
         if (!this.keyword) {
           this.$q.notify('Bạn chưa chọn từ khóa')
