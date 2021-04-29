@@ -65,8 +65,9 @@ export default {
       rows.forEach(row => {
         pages.push({ link: row[0] });
       });
+      
+      this.$store.commit('running/setPageIndex', this.pages.length > 0 ? this.pageIndex + 1 : 0);
       this.$store.commit('running/mergePages', pages);
-      this.$store.commit('running/setPageIndex', this.pageIndex - 1|| 0);
     })
   },
   methods: {

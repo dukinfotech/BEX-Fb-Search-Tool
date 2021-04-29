@@ -10,9 +10,9 @@
         :disabled="locations.length == 0 || currentLocationIndex == locations.length-1 || isRunning" @click="nextLocation()"/>
     </div>
     <q-select filled dense v-model="keyword" :options="keywords" label="Từ khóa" />
-    <!-- Running: {{ isRunning }}
-    Searching: {{ isSearching }} -->
-    <div v-if="pageIndex!=null">
+    Running: {{ isRunning }}
+    Loading: {{ isSearching }}
+    <div v-if="pages.length > 0">
       {{ isRunning ? 'Đang' : 'Đã' }} lấy dữ liệu #{{ isRunning ? pageIndex + 1 : pageIndex }}
     </div>
     <div v-if="category && category.value">
@@ -80,14 +80,12 @@ export default {
         var { data } = await this.$q.bex.send('isRunning', { isRunning: this.isRunning });
         if (data.length > 0) {  
           this.$store.commit('running/mergePages', data);
-          console.log('pageindex', this.pageIndex);
-          this.$store.commit('running/setPageIndex', this.pageIndex || 0);
           this.$store.commit('running/setIsSearching', true);
           this.$q.bex.send('accessPage', { page: this.pages[this.pageIndex] });
         } else {
           this.stop();
         }
-      } else if (this.isRunning && this.pages[this.pageIndex] != undefined) {
+      } else if (this.isRunning) {
         this.autoAccessPage();
       }
     }, 0);
@@ -96,7 +94,6 @@ export default {
     start() {
       if (this.pages.length > 0) {
         this.$store.commit('running/setRunning', true);
-        this.$store.commit('running/setPageIndex', this.pageIndex || 0);
         this.$store.commit('running/setIsSearching', true);
         this.autoAccessPage();
       } else {
@@ -124,9 +121,7 @@ export default {
       this.$q.bex.send('isRunning', { isRunning: this.isRunning });
     },
     reset() {
-      this.$store.commit('running/setPages', []);
-      this.$store.commit('running/setPageIndex', null);
-      this.$store.commit('running/setCurrentLocationIndex', 0);
+      this.$store.commit('running/clearRunnings');
     },
     prevLocation() {
       this.$store.commit('running/setCurrentLocationIndex', this.currentLocationIndex-1);

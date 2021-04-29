@@ -44,7 +44,7 @@ export function clearRunnings(state) {
   state.keyword = ''
   state.isRunning = false;
   state.pages = [];
-  state.pageIndex = null;
+  state.pageIndex = 0;
   state.isSearching = false;
   state.currentLocationIndex = 0;
   chrome.storage.local.set(state);

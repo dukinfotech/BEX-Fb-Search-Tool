@@ -3,7 +3,7 @@ export function loadRunningDataFromStorage (context) {
     context.commit('setKey', result.keyword || '');
     context.commit('setRunning', result.isRunning || false);
     context.commit('setPages', result.pages || []);
-    context.commit('setPageIndex', result.pageIndex || null);
+    context.commit('setPageIndex', result.pageIndex || 0);
     context.commit('setIsSearching', result.isSearching || false);
     context.commit('setCurrentLocationIndex', result.currentLocationIndex || 0);
   });
