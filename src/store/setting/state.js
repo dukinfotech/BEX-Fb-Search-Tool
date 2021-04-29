@@ -3,6 +3,7 @@ export default function () {
     keywords: [],
     locations: [],
     category: null,
-    delay: 3000
+    delay: 3000,
+    ggSheetId: ''
   }
 }

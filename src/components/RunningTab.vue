@@ -76,7 +76,6 @@ export default {
     // isSearching is status access to a page and search data
     setTimeout(async () => {
       if (this.isSearching === false) {
-        console.log('Đang tìm kiếm các trang theo từ khóa');
         // Lấy danh sách các pages tìm kiếm được
         var { data } = await this.$q.bex.send('isRunning', { isRunning: this.isRunning });
         if (data.length > 0) {  

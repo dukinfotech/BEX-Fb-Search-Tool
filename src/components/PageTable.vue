@@ -11,15 +11,19 @@
     <template v-slot:top>
       <q-btn color="positive" label="Import" :disabled="isRunning" @click="pickFile()"/>
       <input type="file" id="my_file" style="display:none;">
-      <q-btn class="q-ml-sm" color="pink-14" label="Export" :disabled="isRunning || pages.length == 0"/>
+      <q-btn class="q-ml-sm" color="pink-14" label="Export" :disabled="isExporting || isRunning || pages.length == 0" @click="exportToSheet()"/>
     </template>
   </q-table>
 </template>
 
 <script>
 import readXlsxFile from 'read-excel-file'
+const { GoogleSpreadsheet } = require('google-spreadsheet');
 export default {
   computed: {
+    ggSheetId() {
+      return this.$store.state.setting.ggSheetId;
+    },
     isRunning() {
       return this.$store.state.running.isRunning;
     },
@@ -37,6 +41,7 @@ export default {
   },
   data () {
     return {
+      isExporting: false,
       pagination: {
         rowsPerPage: 15
       },
@@ -67,6 +72,42 @@ export default {
   methods: {
     pickFile() {
       document.querySelector('#my_file').click();
+    },
+    async exportToSheet() {
+      if (! this.ggSheetId) {
+        this.$q.notify('Bạn chưa thiết lập Google Sheet ID');
+        return;
+      }
+      try {
+        this.isExporting = true;
+        const creds = require('app/src/keys.json');
+        const doc = new GoogleSpreadsheet(this.ggSheetId);
+        await doc.useServiceAccountAuth(creds);
+  
+        await doc.loadInfo();
+        const sheet = doc.sheetsByIndex[0];
+        var rows = [];
+        this.pages.forEach(page => {
+          var row = {};
+          row['Tên'] = page.name || '';
+          row['Link'] = page.link || '';
+          row['Bài đăng gần nhất'] = page.firstPostTime || '';
+          row['Địa chỉ'] = page.address || '';
+          row['Số điện thoại'] = page.phone || '';
+          row['Email'] = page.email || '';
+          row['Website'] = page.website || '';
+          rows.push(row);
+        });
+        await sheet.setHeaderRow(['Tên', 'Link', 'Bài đăng gần nhất', 'Địa chỉ', 'Số điện thoại', 'Email', 'Website']);
+        await sheet.addRows(rows);
+        this.$q.notify({
+          type: 'positive',
+          message: 'Đã export dữ liệu thành công'
+        });
+      } catch (error) {
+        this.$q.notify('Kiểm tra lại kết nối tới Google Sheet');
+      }
+      this.isExporting = false;
     }
   }
 }

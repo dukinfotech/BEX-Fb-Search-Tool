@@ -19,7 +19,8 @@
       />
     </div>
     <q-select class="mt-10" filled dense v-model="category" :options="categories" label="Lĩnh vực" />
-    <q-input label="Thời gian delay mỗi trang (3000 = 3s)" v-model="delay"/>
+    <q-input class="mt-10" filled dense label="Thời gian delay mỗi trang (3000 = 3s)" v-model="delay"/>
+    <q-input class="mt-10" filled dense label="Google Sheet ID" v-model="ggSheetId"/>
     <location-table class="mt-10"/>
   </div>
 </template>
@@ -37,6 +38,14 @@ export default {
       },
       set(val) {
         this.$store.commit('setting/setDelay', Number(val))
+      }
+    },
+    ggSheetId: {
+      get() {
+        return this.$store.state.setting.ggSheetId;
+      },
+      set(val) {
+        this.$store.commit('setting/setGGSheetId', val);
       }
     },
     category: {

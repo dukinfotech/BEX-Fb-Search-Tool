@@ -28,6 +28,11 @@ export function setDelay (state, time) {
   storeSettings(state)
 }
 
+export function setGGSheetId (state, id) {
+  state.ggSheetId = id
+  storeSettings(state)
+}
+
 function storeSettings(state) {
   chrome.storage.local.set(state);
 }
@@ -37,5 +42,6 @@ export function clearSettings(state) {
   state.locations = [];
   state.category = null;
   state.delay = 3000;
+  state.ggSheetId = '';
   chrome.storage.local.set(state);
 }
