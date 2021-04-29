@@ -86,39 +86,34 @@ export default {
           this.stop();
         }
       } else if (this.isRunning && this.pages[this.pageIndex] != undefined) {
-        // Truy cập vào từng trang web
-        this.$q.bex.send('getPageInfo').then(res => {
-          var info = res.data;
-          this.$store.commit('running/updatePages', {index: this.pageIndex, value: info});
-          this.$store.commit('running/setPageIndex', this.pageIndex + 1);
-          // Tiếp tục chạy link tiếp theo
-          if (this.pages[this.pageIndex] != undefined) {
-            this.$q.bex.send('accessPage', { page: this.pages[this.pageIndex] });
-          } else {
-            this.$store.commit('running/setRunning', false);
-            this.$store.commit('running/setIsSearching', false);
-          }
-        });
+        this.autoAccessPage();
       }
     }, 0);
   },
   methods: {
     start() {
-      if (!this.keyword) {
-        this.$q.notify('Bạn chưa chọn từ khóa')
-      } else {
+      if (this.pages.length > 0) {
         this.$store.commit('running/setRunning', true);
-        var filters = [];
-        if (this.category && this.category.value) {
-          var categoryFilter = transformFilter('category', 'pages_category', this.category.value);
-          filters.push(categoryFilter);
+        this.$store.commit('running/setPageIndex', this.pageIndex || 0);
+        this.$store.commit('running/setIsSearching', true);
+        this.autoAccessPage();
+      } else {
+        if (!this.keyword) {
+          this.$q.notify('Bạn chưa chọn từ khóa')
+        } else {
+          this.$store.commit('running/setRunning', true);
+          var filters = [];
+          if (this.category && this.category.value) {
+            var categoryFilter = transformFilter('category', 'pages_category', this.category.value);
+            filters.push(categoryFilter);
+          }
+          if (this.locations.length > 0) {
+            var locationFilter = transformFilter('filter_pages_location', 'filter_pages_location', this.locations[this.currentLocationIndex].code);
+            filters.push(locationFilter);
+          }
+          var url = makeURL(filters, this.keyword);
+          this.$q.bex.send('fb.redirect', { url: url });
         }
-        if (this.locations.length > 0) {
-          var locationFilter = transformFilter('filter_pages_location', 'filter_pages_location', this.locations[this.currentLocationIndex].code);
-          filters.push(locationFilter);
-        }
-        var url = makeURL(filters, this.keyword);
-        this.$q.bex.send('fb.redirect', { url: url });
       }
     },
     stop() {
@@ -136,6 +131,21 @@ export default {
     },
     nextLocation() {
       this.$store.commit('running/setCurrentLocationIndex', this.currentLocationIndex+1);
+    },
+    autoAccessPage() {
+      // Truy cập vào từng trang web
+      this.$q.bex.send('getPageInfo').then(res => {
+        var info = res.data;
+        this.$store.commit('running/updatePages', {index: this.pageIndex, value: info});
+        this.$store.commit('running/setPageIndex', this.pageIndex + 1);
+        // Tiếp tục chạy link tiếp theo
+        if (this.pages[this.pageIndex] != undefined) {
+          this.$q.bex.send('accessPage', { page: this.pages[this.pageIndex] });
+        } else {
+          this.$store.commit('running/setRunning', false);
+          this.$store.commit('running/setIsSearching', false);
+        }
+      });
     }
   }
 }

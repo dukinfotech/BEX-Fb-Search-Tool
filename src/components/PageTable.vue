@@ -9,13 +9,15 @@
     row-key="index"
   >
     <template v-slot:top>
-      <q-btn color="positive" label="Import" :disabled="isRunning"/>
+      <q-btn color="positive" label="Import" :disabled="isRunning" @click="pickFile()"/>
+      <input type="file" id="my_file" style="display:none;">
       <q-btn class="q-ml-sm" color="pink-14" label="Export" :disabled="isRunning || pages.length == 0"/>
     </template>
   </q-table>
 </template>
 
 <script>
+import readXlsxFile from 'read-excel-file'
 export default {
   computed: {
     isRunning() {
@@ -28,7 +30,10 @@ export default {
         row.textLink = row.link.substring(20, 60);
       })
       return pages;
-    }
+    },
+    pageIndex() {
+      return this.$store.state.running.pageIndex;
+    },
   },
   data () {
     return {
@@ -47,7 +52,22 @@ export default {
       ]
     }
   },
+  mounted() {
+    const input = document.querySelector('#my_file');
+    input.addEventListener('change', async () => {
+      var pages = [];
+      var rows = await readXlsxFile(input.files[0]);
+      rows.forEach(row => {
+        pages.push({ link: row[0] });
+      });
+      this.$store.commit('running/mergePages', pages);
+      this.$store.commit('running/setPageIndex', this.pageIndex - 1|| 0);
+    })
+  },
   methods: {
+    pickFile() {
+      document.querySelector('#my_file').click();
+    }
   }
 }
 </script>
