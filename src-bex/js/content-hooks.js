@@ -25,6 +25,10 @@ export default function attachContentHooks (bridge) {
 
   window.onload = function () {
     bridge.on('isRunning', event => {
+      var counter = 0;
+      setTimeout(function () {
+        counter += 1000;
+      });
       const payload = event.data
       if (payload.isRunning) {
         // Auto scroll to bottom
@@ -43,7 +47,8 @@ export default function attachContentHooks (bridge) {
               bodyTagText.includes(endScrollText3) ||
               bodyTagText.includes(endScrollText4) ||
               bodyTagText.includes(endScrollText5) ||
-              bodyTagText.includes(endScrollText6)) {
+              bodyTagText.includes(endScrollText6) ||
+              counter == 30000) {
             console.log('Stop auto scroll');
             clearInterval(scrollInfinitely);
             var pages = collectPagesInfo();
