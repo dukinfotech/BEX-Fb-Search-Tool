@@ -19,6 +19,7 @@
       />
     </div>
     <q-select class="mt-10" filled dense v-model="category" :options="categories" label="Lĩnh vực" />
+    <q-input label="Thời gian delay mỗi trang (3000 = 3s)" v-model="delay"/>
     <location-table class="mt-10"/>
   </div>
 </template>
@@ -29,11 +30,15 @@ import LocationTable from './LocationTable.vue'
 
 export default {
   components: { LocationTable },
-  data() {
-    return {
-    }
-  },
   computed: {
+    delay: {
+      get() {
+        return this.$store.state.setting.delay;
+      },
+      set(val) {
+        this.$store.commit('setting/setDelay', Number(val))
+      }
+    },
     category: {
       get() {
         return this.$store.state.setting.category ? this.$store.state.setting.category.label : null

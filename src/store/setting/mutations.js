@@ -23,6 +23,11 @@ export function setCategory (state, category) {
   storeSettings(state)
 }
 
+export function setDelay (state, time) {
+  state.delay = time
+  storeSettings(state)
+}
+
 function storeSettings(state) {
   chrome.storage.local.set(state);
 }
@@ -31,5 +36,6 @@ export function clearSettings(state) {
   state.keywords = [];
   state.locations = [];
   state.category = null;
+  state.delay = 3000;
   chrome.storage.local.set(state);
 }

@@ -54,6 +54,9 @@ export default {
     locations() {
       return this.$store.state.setting.locations;
     },
+    delay() {
+      return this.$store.state.setting.delay;
+    },
     category() {
       return this.$store.state.setting.category;
     },
@@ -134,7 +137,7 @@ export default {
     },
     autoAccessPage() {
       // Truy cập vào từng trang web
-      this.$q.bex.send('getPageInfo').then(res => {
+      this.$q.bex.send('getPageInfo', { delay: this.delay }).then(res => {
         var info = res.data;
         this.$store.commit('running/updatePages', {index: this.pageIndex, value: info});
         this.$store.commit('running/setPageIndex', this.pageIndex + 1);

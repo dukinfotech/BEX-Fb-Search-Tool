@@ -60,6 +60,7 @@ export default function attachContentHooks (bridge) {
   });
 
   bridge.on('getPageInfo',async event => {
+    const payload = event.data;
     try {
       var page = {
         name: '',
@@ -69,7 +70,7 @@ export default function attachContentHooks (bridge) {
         email: '',
         address: ''
       };
-      await wait(3000);
+      await wait(payload.delay);
       var firstPostCard = document.body.querySelector('div[aria-posinset="1"]');
 
       // Get first post time
