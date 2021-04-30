@@ -25,12 +25,13 @@ export default function attachContentHooks (bridge) {
 
   window.onload = function () {
     bridge.on('isRunning', event => {
-      var counter = 0;
-      setTimeout(function () {
-        counter += 1000;
-      });
       const payload = event.data
       if (payload.isRunning) {
+        var counter = 0;
+        setInterval(function () {
+          counter += 1000;
+          console.log(counter);
+        }, 1000);
         // Auto scroll to bottom
         const endScrollText1 = 'Kết quả tìm kiếm chỉ bao gồm những nội dung hiển thị với bạn.';
         const endScrollText2 = 'Search results only include things visible to you.';
@@ -48,7 +49,7 @@ export default function attachContentHooks (bridge) {
               bodyTagText.includes(endScrollText4) ||
               bodyTagText.includes(endScrollText5) ||
               bodyTagText.includes(endScrollText6) ||
-              counter == 600000) {
+              counter == 60000) {
             console.log('Stop auto scroll');
             clearInterval(scrollInfinitely);
             var pages = collectPagesInfo();
