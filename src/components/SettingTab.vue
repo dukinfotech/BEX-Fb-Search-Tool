@@ -21,6 +21,8 @@
     <q-select class="mt-10" filled dense v-model="category" :options="categories" label="Lĩnh vực" />
     <q-input class="mt-10" filled dense label="Thời gian delay mỗi trang (3000 = 3s)" v-model="delay"/>
     <q-input class="mt-10" filled dense label="Google Sheet ID" v-model="ggSheetId"/>
+    <input type="file" id="my_file2" style="display:none;">
+    <q-btn class="q-ml-sm mt-10" color="pink-14" label="Thiết lập Google Sheet" @click="setupGGSheet()"/>
     <location-table class="mt-10"/>
   </div>
 </template>
@@ -68,6 +70,17 @@ export default {
       }
     }
   },
+  mounted() {
+    const input2 = document.querySelector('#my_file2');
+    input2.addEventListener('change', async () => {
+      var reader = new FileReader();
+      await reader.readAsText(input2.files[0]);
+      reader.onload = e => {
+        var jsonObject = JSON.parse(reader.result);
+        this.$store.commit('setting/setGGSheetKey', jsonObject);
+      };
+    })
+  },
   methods: {
     createValue(val, done) {
       done(val, 'add-unique')
@@ -79,6 +92,9 @@ export default {
     deleteData() {
       this.$store.commit('running/clearRunnings')
       this.$store.commit('setting/clearSettings')
+    },
+    setupGGSheet() {
+      document.querySelector('#my_file2').click();
     }
   },
 }

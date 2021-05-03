@@ -4,6 +4,7 @@ export default function () {
     locations: [],
     category: null,
     delay: 3000,
-    ggSheetId: ''
+    ggSheetId: '',
+    ggSheetKey: null
   }
 }

@@ -33,6 +33,11 @@ export function setGGSheetId (state, id) {
   storeSettings(state)
 }
 
+export function setGGSheetKey (state, key) {
+  state.ggSheetKey = key
+  storeSettings(state)
+}
+
 function storeSettings(state) {
   chrome.storage.local.set(state);
 }
@@ -43,5 +48,6 @@ export function clearSettings(state) {
   state.category = null;
   state.delay = 3000;
   state.ggSheetId = '';
+  state.ggSheetKey = null;
   chrome.storage.local.set(state);
 }

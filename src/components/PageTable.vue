@@ -24,6 +24,9 @@ export default {
     ggSheetId() {
       return this.$store.state.setting.ggSheetId;
     },
+    ggSheetKey() {
+      return this.$store.state.setting.ggSheetKey;
+    },
     isRunning() {
       return this.$store.state.running.isRunning;
     },
@@ -73,15 +76,14 @@ export default {
       document.querySelector('#my_file').click();
     },
     async exportToSheet() {
-      if (! this.ggSheetId) {
-        this.$q.notify('Bạn chưa thiết lập Google Sheet ID');
+      if (! this.ggSheetId || !this.ggSheetKey) {
+        this.$q.notify('Bạn chưa thiết lập Google Sheet');
         return;
       }
       try {
         this.isExporting = true;
-        const creds = require('app/src/keys.json');
         const doc = new GoogleSpreadsheet(this.ggSheetId);
-        await doc.useServiceAccountAuth(creds);
+        await doc.useServiceAccountAuth(this.ggSheetKey);
   
         await doc.loadInfo();
         const sheet = doc.sheetsByIndex[0];
