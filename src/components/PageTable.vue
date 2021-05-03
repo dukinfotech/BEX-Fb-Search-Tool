@@ -94,7 +94,7 @@ export default {
           row['Link'] = page.link || '';
           row['Bài đăng gần nhất'] = page.firstPostTime || '';
           row['Địa chỉ'] = page.address || '';
-          row['Số điện thoại'] = page.phone || '';
+          row['Số điện thoại'] = '\'' + page.phone || '';
           row['Email'] = page.email || '';
           row['Website'] = page.website || '';
           rows.push(row);

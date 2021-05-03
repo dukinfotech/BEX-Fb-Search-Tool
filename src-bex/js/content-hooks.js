@@ -99,22 +99,19 @@ export default function attachContentHooks (bridge) {
       var iconCount = icons.length;
       for (let i = 0; i < iconCount; i++) {
         var icon = icons[i];
-        var bgPos = icon.style.backgroundPosition;
-        switch (bgPos) {
-          case '0px -496px':
-            var website = getTextFromIcon(icon);
-            page.website = website;
-            break;
-          case '0px -650px':
-            var phone = getTextFromIcon(icon);
-            page.phone = phone;
-            break;
-          case '0px -342px':
-            var email = getTextFromIcon(icon);
-            page.email = email;
-            break;
-          default:
-            break;
+        var text = getTextFromIcon(icon);
+        // Get phone
+        var text2 = text.replace(/\s/g, '');
+        if (/^\+?\d+$/.test(text2)) {
+          page.phone = text
+        }
+        // Get Email
+        if (/@/.test(text)) {
+          page.email = text
+        }
+        // Get Website
+        if (/^http/.test(text)) {
+          page.website = text
         }
       } 
     } catch (error) {
