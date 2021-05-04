@@ -22,7 +22,9 @@
     <q-input class="mt-10" filled dense label="Thời gian delay mỗi trang (3000 = 3s)" v-model="delay"/>
     <q-input class="mt-10" filled dense label="Google Sheet ID" v-model="ggSheetId"/>
     <input type="file" id="my_file2" style="display:none;">
-    <q-btn class="q-ml-sm mt-10" color="pink-14" label="Thiết lập Google Sheet" @click="setupGGSheet()"/>
+    <q-btn class="q-ml-sm mt-10" :color="this.ggSheetKey ? 'positive' : 'pink-14'" 
+      :label="this.ggSheetKey ? 'Đã thiết lập GG Sheet' : 'Thiết lập GG Sheet'"
+      @click="setupGGSheet()"/>
     <location-table class="mt-10"/>
   </div>
 </template>
@@ -34,6 +36,9 @@ import LocationTable from './LocationTable.vue'
 export default {
   components: { LocationTable },
   computed: {
+    ggSheetKey: function () {
+      return this.$store.state.setting.ggSheetKey;
+    },
     delay: {
       get() {
         return this.$store.state.setting.delay;

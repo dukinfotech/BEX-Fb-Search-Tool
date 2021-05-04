@@ -32,10 +32,17 @@
 <script>
 import { transformFilter, makeURL } from 'app/src/helpers'
 import PageTable from './PageTable.vue'
+const { GoogleSpreadsheet } = require('google-spreadsheet');
 
 export default {
   components: { PageTable },
   computed: {
+    ggSheetId() {
+      return this.$store.state.setting.ggSheetId;
+    },
+    ggSheetKey() {
+      return this.$store.state.setting.ggSheetKey;
+    },
     currentLocationIndex() {
       return this.$store.state.running.currentLocationIndex;
     },
@@ -131,10 +138,11 @@ export default {
     },
     autoAccessPage() {
       // Truy cập vào từng trang web
-      this.$q.bex.send('getPageInfo', { delay: this.delay }).then(res => {
+      this.$q.bex.send('getPageInfo', { delay: this.delay }).then(async res => {
         var info = res.data;
         this.$store.commit('running/updatePages', {index: this.pageIndex, value: info});
         this.$store.commit('running/setPageIndex', this.pageIndex + 1);
+        await this.writeToGGSheet(this.pages[this.pageIndex-1]);
         // Tiếp tục chạy link tiếp theo
         if (this.pages[this.pageIndex] != undefined) {
           this.$q.bex.send('accessPage', { page: this.pages[this.pageIndex] });
@@ -143,6 +151,35 @@ export default {
           this.$store.commit('running/setIsSearching', false);
         }
       });
+    },
+    async writeToGGSheet(page) {
+      if (this.ggSheetId && this.ggSheetKey) {
+        try {
+          const doc = new GoogleSpreadsheet(this.ggSheetId);
+          await doc.useServiceAccountAuth(this.ggSheetKey);
+    
+          await doc.loadInfo();
+          const sheet = doc.sheetsByIndex[0];
+          await sheet.setHeaderRow(['Tên', 'Link', 'Bài đăng gần nhất', 'Địa chỉ', 'Số điện thoại', 'Email', 'Website']);
+
+          var row = {};
+          row['Tên'] = page.name || '';
+          row['Link'] = page.link || '';
+          row['Bài đăng gần nhất'] = page.firstPostTime || '';
+          row['Địa chỉ'] = page.address || '';
+          row['Số điện thoại'] = '\'' + page.phone || '';
+          row['Email'] = page.email || '';
+          row['Website'] = page.website || '';
+
+          await sheet.addRow(row);
+          this.$q.notify({
+            type: 'positive',
+            message: 'Đã lưu vào Google Sheet'
+          });
+        } catch (error) {
+          this.$q.notify('Kiểm tra lại kết nối tới Google Sheet');
+        }
+      }
     }
   }
 }
