@@ -5,9 +5,9 @@
       <q-btn v-else class="control-btn" color="negative" label="Dừng" @click="stop()"/>
       <q-btn class="control-btn" color="primary" label="Reset" @click="reset()" :disabled="isRunning && isSearching"/>
       <q-btn class="control-btn" color="primary" label="<" 
-        :disabled="locations.length == 0 || currentLocationIndex == 0 || isRunning" @click="prevLocation()"/>
+        :disabled="selectedLocations.length == 0 || currentLocationIndex == 0 || isRunning" @click="prevLocation()"/>
       <q-btn class="control-btn" color="primary" label=">" 
-        :disabled="locations.length == 0 || currentLocationIndex == locations.length-1 || isRunning" @click="nextLocation()"/>
+        :disabled="selectedLocations.length == 0 || currentLocationIndex == selectedLocations.length-1 || isRunning" @click="nextLocation()"/>
     </div>
     <q-select filled dense v-model="keyword" :options="keywords" label="Từ khóa" />
     Running: {{ isRunning }}
@@ -18,9 +18,9 @@
     <div v-if="category && category.value">
       Lĩnh vực: {{ category.label }}
     </div>
-    <div v-if="locations.length > 0">
+    <div v-if="selectedLocations.length > 0">
       Địa điểm: 
-      <span v-bind:key="index" v-for="(item, index) in locations">
+      <span v-bind:key="index" v-for="(item, index) in selectedLocations">
         <span :class="index==currentLocationIndex?'text-negative':''">{{ item.city }}</span>,&nbsp;
       </span>
     </div>
@@ -58,8 +58,8 @@ export default {
     isSearching() {
       return this.$store.state.running.isSearching;
     },
-    locations() {
-      return this.$store.state.setting.locations;
+    selectedLocations() {
+      return this.$store.state.setting.selectedLocations;
     },
     delay() {
       return this.$store.state.setting.delay;
@@ -113,8 +113,8 @@ export default {
             var categoryFilter = transformFilter('category', 'pages_category', this.category.value);
             filters.push(categoryFilter);
           }
-          if (this.locations.length > 0) {
-            var locationFilter = transformFilter('filter_pages_location', 'filter_pages_location', this.locations[this.currentLocationIndex].code);
+          if (this.selectedLocations.length > 0) {
+            var locationFilter = transformFilter('filter_pages_location', 'filter_pages_location', this.selectedLocations[this.currentLocationIndex].code);
             filters.push(locationFilter);
           }
           var url = makeURL(filters, this.keyword);

@@ -18,14 +18,16 @@ import constants from 'app/src/constants'
 export default {
   computed: {
     data() {
-      return constants.locations;
+      var constLocations = constants.locations;
+      var addedLocations = this.$store.state.setting.locations;
+      return addedLocations.concat(constLocations);
     },
     selected: {
       get() {
-        return this.$store.state.setting.locations;
+        return this.$store.state.setting.selectedLocations;
       },
       set(val) {
-        this.$store.commit('setting/setLocations', val)
+        this.$store.commit('setting/setSelectedLocations', val)
       }
     }
   },

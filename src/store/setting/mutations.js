@@ -18,6 +18,17 @@ export function setLocations (state, locations) {
   storeSettings(state)
 }
 
+export function addLocation (state, location) {
+  var newLocation = { city: location.city, code: location.code };
+  state.locations.unshift(newLocation);
+  storeSettings(state)
+}
+
+export function setSelectedLocations (state, locations) {
+  state.selectedLocations = locations
+  storeSettings(state)
+}
+
 export function setCategory (state, category) {
   state.category = category
   storeSettings(state)
@@ -45,6 +56,7 @@ function storeSettings(state) {
 export function clearSettings(state) {
   state.keywords = [];
   state.locations = [];
+  state.selectedLocations = [];
   state.category = null;
   state.delay = 3000;
   state.ggSheetId = '';

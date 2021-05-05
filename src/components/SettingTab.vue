@@ -19,12 +19,19 @@
       />
     </div>
     <q-select class="mt-10" filled dense v-model="category" :options="categories" label="Lĩnh vực" />
-    <q-input class="mt-10" filled dense label="Thời gian delay mỗi trang (3000 = 3s)" v-model="delay"/>
-    <q-input class="mt-10" filled dense label="Google Sheet ID" v-model="ggSheetId"/>
+    <div class="row">
+      <q-input class="mt-10 col-6" filled dense label="Thời gian delay mỗi trang (3000 = 3s)" v-model="delay"/>
+      <q-input class="mt-10 col-6" filled dense label="Google Sheet ID" v-model="ggSheetId"/>
+    </div>
     <input type="file" id="my_file2" style="display:none;">
     <q-btn class="q-ml-sm mt-10" :color="this.ggSheetKey ? 'positive' : 'pink-14'" 
       :label="this.ggSheetKey ? 'Đã thiết lập GG Sheet' : 'Thiết lập GG Sheet'"
       @click="setupGGSheet()"/>
+    <div class="row">
+      <q-input class="mt-10 col-5" filled dense label="Tên địa điểm" v-model="location.city"/>
+      <q-input class="mt-10 col-5" filled dense label="Mã địa điểm" v-model="location.code"/>
+      <q-btn class="mt-10 col-2" color="primary" label="Thêm" @click="addLocation()"/>
+    </div>
     <location-table class="mt-10"/>
   </div>
 </template>
@@ -35,6 +42,14 @@ import LocationTable from './LocationTable.vue'
 
 export default {
   components: { LocationTable },
+  data() {
+    return {
+      location: {
+        city: '',
+        code: '',
+      }
+    }
+  },
   computed: {
     ggSheetKey: function () {
       return this.$store.state.setting.ggSheetKey;
@@ -100,6 +115,18 @@ export default {
     },
     setupGGSheet() {
       document.querySelector('#my_file2').click();
+    },
+    async addLocation() {
+      if (this.location.city.trim() && this.location.code.trim()) {
+        this.$store.commit('setting/setSelectedLocations', []);
+        await this.$store.dispatch('setting/addLocation', this.location);
+        this.location.city = '';
+        this.location.code = '';
+        this.$q.notify({
+          type: 'positive',
+          message: 'Đã thêm địa điểm thành công.'
+        });
+      }
     }
   },
 }
