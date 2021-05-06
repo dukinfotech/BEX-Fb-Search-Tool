@@ -47,10 +47,16 @@ export function clearRunnings(state) {
   state.pageIndex = 0;
   state.isSearching = false;
   state.currentLocationIndex = 0;
+  state.currentKeywordIndex = 0;
   chrome.storage.local.set(state);
 }
 
 export function setCurrentLocationIndex(state, x) {
   state.currentLocationIndex = x;
+  chrome.storage.local.set(state);
+}
+
+export function setCurrentKeywordIndex(state, index) {
+  state.currentKeywordIndex = index;
   chrome.storage.local.set(state);
 }

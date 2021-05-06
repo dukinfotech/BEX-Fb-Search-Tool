@@ -10,11 +10,8 @@
         :disabled="selectedLocations.length == 0 || currentLocationIndex == selectedLocations.length-1 || isRunning" @click="nextLocation()"/>
     </div>
     <q-select filled dense v-model="keyword" :options="keywords" label="Từ khóa" />
-    Running: {{ isRunning }}
-    Loading: {{ isSearching }}
-    <div v-if="pages.length > 0">
-      {{ 'Đang lấy dữ liệu #' + (pageIndex + 1) }}
-    </div>
+    <!-- Running: {{ isRunning }}
+    Loading: {{ isSearching }} -->
     <div v-if="category && category.value">
       Lĩnh vực: {{ category.label }}
     </div>
@@ -23,6 +20,15 @@
       <span v-bind:key="index" v-for="(item, index) in selectedLocations">
         <span :class="index==currentLocationIndex?'text-negative':''">{{ item.city }}</span>,&nbsp;
       </span>
+    </div>
+    <div v-if="keywords.length > 0">
+      Từ khóa: 
+      <span v-bind:key="index" v-for="(item, index) in keywords">
+        <span :class="index==currentKeywordIndex&&item==keyword?'text-negative':''">{{ item }}</span>,&nbsp;
+      </span>
+    </div>
+    <div v-if="pages.length > 0">
+      {{ 'Đang lấy dữ liệu #' + (pageIndex + 1) }}
     </div>
     <q-linear-progress v-if="isRunning" query color="warning" class="q-mt-sm" />
     <page-table style="margin-top:10px"/>
@@ -67,12 +73,18 @@ export default {
     category() {
       return this.$store.state.setting.category;
     },
+    currentKeywordIndex() {
+      return this.$store.state.running.currentKeywordIndex;
+    },
     keyword: {
       get() {
         return this.$store.state.running.keyword
       },
       set(val) {
+        var keywordIndex = this.keywords.indexOf(val);
         this.$store.commit('running/setKey', val)
+        this.$store.commit('running/setCurrentLocationIndex', 0)
+        this.$store.commit('running/setCurrentKeywordIndex', keywordIndex)
       }
     },
     keywords () {
@@ -87,10 +99,23 @@ export default {
         var { data } = await this.$q.bex.send('isRunning', { isRunning: this.isRunning });
         if (data.length > 0) {  
           this.$store.commit('running/mergePages', data);
-          this.$store.commit('running/setIsSearching', true);
-          this.$q.bex.send('accessPage', { page: this.pages[this.pageIndex] });
+        }
+        this.nextLocation();
+        if (this.currentLocationIndex == this.selectedLocations.length) {
+          this.nextKeyword();
+          if (this.currentKeywordIndex < this.keywords.length) {
+            this.$store.commit('running/setCurrentLocationIndex', 0);
+          }
+        }
+        if (this.currentKeywordIndex < this.keywords.length) {
+          this.start();
         } else {
-          this.stop();
+          if (this.pages.length > 0) {
+            this.$store.commit('running/setIsSearching', true);
+            this.$q.bex.send('accessPage', { page: this.pages[this.pageIndex] });
+          } else {
+            this.stop();
+          }
         }
       } else if (this.isRunning) {
         this.autoAccessPage();
@@ -99,7 +124,7 @@ export default {
   },
   methods: {
     start() {
-      if (this.pages.length > 0) {
+      if (this.pages.length > 0 && this.currentKeywordIndex == this.keywords.length && this.currentLocationIndex == this.selectedLocations.length) {
         this.$store.commit('running/setRunning', true);
         this.$store.commit('running/setIsSearching', true);
         this.$q.bex.send('accessPage', { page: this.pages[this.pageIndex] });
@@ -117,7 +142,7 @@ export default {
             var locationFilter = transformFilter('filter_pages_location', 'filter_pages_location', this.selectedLocations[this.currentLocationIndex].code);
             filters.push(locationFilter);
           }
-          var url = makeURL(filters, this.keyword);
+          var url = makeURL(filters, this.keywords[this.currentKeywordIndex]);
           this.$q.bex.send('fb.redirect', { url: url });
         }
       }
@@ -135,6 +160,10 @@ export default {
     },
     nextLocation() {
       this.$store.commit('running/setCurrentLocationIndex', this.currentLocationIndex+1);
+    },
+    nextKeyword() {
+      this.$store.commit('running/setCurrentKeywordIndex', this.currentKeywordIndex+1);
+      this.$store.commit('running/setKey', this.keywords[this.currentKeywordIndex]);
     },
     autoAccessPage() {
       // Truy cập vào từng trang web
