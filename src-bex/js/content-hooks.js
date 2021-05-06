@@ -77,7 +77,9 @@ export default function attachContentHooks (bridge) {
         email: '',
         address: ''
       };
-      await wait(payload.delay);
+      var randomSeconds = [1000, 2000, 5000, 8000, 10000];
+      var randomIndex = Math.floor(Math.random() * 5);
+      await wait(payload.delay + randomSeconds[randomIndex]);
       var firstPostCard = document.body.querySelector('div[aria-posinset="1"]');
 
       // Get first post time
