@@ -6,6 +6,7 @@ export default function () {
     pageIndex: 0,
     isSearching: false,
     currentLocationIndex: 0,
-    currentKeywordIndex: 0
+    currentKeywordIndex: 0,
+    isLoggedIn: false
   }
 }

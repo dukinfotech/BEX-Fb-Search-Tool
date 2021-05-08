@@ -9,3 +9,9 @@ export function loadRunningDataFromStorage (context) {
     context.commit('setCurrentKeywordIndex', result.currentKeywordIndex || 0);
   });
 }
+
+export function loadLoggedInStatus (context) {
+  chrome.storage.local.get(['isLoggedIn'], function(result) {
+    context.commit('setIsLoggedIn', result.isLoggedIn);
+  });
+}

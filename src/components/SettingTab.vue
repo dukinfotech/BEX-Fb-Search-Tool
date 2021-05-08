@@ -1,7 +1,7 @@
 <template>
   <div>
-    <div>
-      <q-btn color="red" label="Xóa cache" @click="deleteData()"/>
+    <div class="row justify-end">
+      <q-btn color="red" label="Đăng xuất" @click="logout()"/>
     </div>
     <div class="mt-10">
       <q-select
@@ -109,9 +109,10 @@ export default {
     removeValue({index, val}) {
       this.$store.commit('setting/removeKey', {index, val})
     },
-    deleteData() {
+    logout() {
       this.$store.commit('running/clearRunnings')
       this.$store.commit('setting/clearSettings')
+      this.$router.replace('/');
     },
     setupGGSheet() {
       document.querySelector('#my_file2').click();

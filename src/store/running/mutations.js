@@ -40,6 +40,11 @@ export function setIsSearching(state, status) {
   chrome.storage.local.set(state);
 }
 
+export function setIsLoggedIn(state, status) {
+  state.isLoggedIn = status
+  chrome.storage.local.set(state);
+}
+
 export function clearRunnings(state) {
   state.keyword = ''
   state.isRunning = false;
@@ -48,6 +53,8 @@ export function clearRunnings(state) {
   state.isSearching = false;
   state.currentLocationIndex = 0;
   state.currentKeywordIndex = 0;
+  state.currentKeywordIndex = 0;
+  state.isLoggedIn = false;
   chrome.storage.local.set(state);
 }
 

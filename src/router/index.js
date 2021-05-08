@@ -14,7 +14,7 @@ Vue.use(VueRouter)
  * with the Router instance.
  */
 
-export default function (/* { store, ssrContext } */) {
+export default function ({ store }) {
   const Router = new VueRouter({
     scrollBehavior: () => ({ x: 0, y: 0 }),
     routes,
@@ -26,5 +26,17 @@ export default function (/* { store, ssrContext } */) {
     base: process.env.VUE_ROUTER_BASE
   })
 
+  Router.beforeEach((to, from, next) => {
+    store.dispatch('running/loadLoggedInStatus');
+    setTimeout(() => {
+      var isLoggedIn = store.state.running.isLoggedIn;
+      if (isLoggedIn) {
+        next({ name: 'main'});
+      }
+    }, 0);
+    next();
+  })
+
   return Router
+  
 }
