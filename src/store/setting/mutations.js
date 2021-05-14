@@ -49,6 +49,11 @@ export function setGGSheetKey (state, key) {
   storeSettings(state)
 }
 
+export function setIsToggle (state, isToggle) {
+  state.isToggle = isToggle
+  storeSettings(state)
+}
+
 function storeSettings(state) {
   chrome.storage.local.set(state);
 }

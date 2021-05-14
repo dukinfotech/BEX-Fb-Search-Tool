@@ -1,5 +1,5 @@
 export function loadSettingDataFromStorage (context) {
-  chrome.storage.local.get(['keywords', 'locations', 'selectedLocations', 'category', 'delay', 'ggSheetId', 'ggSheetKey'], function(result) {
+  chrome.storage.local.get(['keywords', 'locations', 'selectedLocations', 'category', 'delay', 'ggSheetId', 'ggSheetKey', 'isToggle'], function(result) {
     context.commit('setKeys', result.keywords || [])
     context.commit('setLocations', result.locations || [])
     context.commit('setSelectedLocations', result.selectedLocations || [])
@@ -7,6 +7,7 @@ export function loadSettingDataFromStorage (context) {
     context.commit('setDelay', result.delay || 3000)
     context.commit('setGGSheetId', result.ggSheetId || '')
     context.commit('setGGSheetKey', result.ggSheetKey || '')
+    context.commit('setIsToggle', result.isToggle)
   });
 }
 

@@ -1,22 +1,31 @@
 const iFrame = document.createElement('iframe')
 iFrame.id = 'bex-app-iframe'
 
-const setIFrameSize = (height, width) => {
+const setIFrameSize = (height, width, isTransparent=false) => {
   iFrame.height = height
   iFrame.width = width
+  // Assign some styling so it looks seamless
+  Object.assign(iFrame.style, {
+    position: 'fixed',
+    top: '0',
+    right: '0',
+    border: '0',
+    zIndex: '9999999', // Make sure it's on top
+    overflow: 'visible',
+    background: isTransparent?'transparent':'#fff'
+  })
 }
 
-
 export default function attachContentHooks (bridge) {
-  bridge.on('wb.drawer.toggle', event => {
+  bridge.on('toggleSize', event => {
     const payload = event.data
-    if (payload.open) {
-      setIFrameSize('100%', '600px')
+    var isToggle = payload.isToggle;
+    if (isToggle) {
+      setIFrameSize('30px', '100px', true);
     } else {
-      resetIframeSize()
+      setIFrameSize('100%', '600px');
     }
-    bridge.send(event.eventResponseKey)
-  })
+  });
 
   bridge.on('fb.redirect', event => {
     const payload = event.data
@@ -145,18 +154,13 @@ async function wait (timeToDelay) {
   return new Promise((resolve) => setTimeout(resolve, timeToDelay));
 }
 
-setIFrameSize('100%', '600px');
-
-// Assign some styling so it looks seamless
-Object.assign(iFrame.style, {
-  position: 'fixed',
-  top: '0',
-  right: '0',
-  border: '0',
-  zIndex: '9999999', // Make sure it's on top
-  overflow: 'visible',
-  background: '#fff'
-})
+chrome.storage.local.get(['isToggle'], function(result) {
+  if (result.isToggle) {
+    setIFrameSize('100%', '600px');
+  } else {
+    setIFrameSize('30px', '100px', true);
+  }
+});
 
 ;(function () {
   // When the page loads, insert our browser extension app.

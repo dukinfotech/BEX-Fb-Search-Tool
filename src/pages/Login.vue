@@ -1,6 +1,7 @@
 <template>
   <div>
-    <q-form action="https://some-url.com" method="post" class="login-form text-center">
+    <MinimizeButton/>
+    <q-form action="https://some-url.com" method="post" class="login-form text-center" v-show="isToggle">
       <div class="form-title text-primary">Đăng nhập</div>
       <q-input filled dense label="Email" v-model="user.email"/>
       <q-input class="mt-10" filled dense label="Password" v-model="user.password" type="password"/>      
@@ -12,7 +13,10 @@
 
 <script>
 import axios from 'axios';
+import MinimizeButton from 'src/components/MinimizeButton.vue'
+
 export default {
+  components: { MinimizeButton },
   data() {
     return {
       user: {
@@ -26,6 +30,9 @@ export default {
   computed: {
     isLoggedIn() {
       return this.$store.state.running.isLoggedIn;
+    },
+    isToggle() {
+      return this.$store.state.setting.isToggle;
     },
   },
   methods: {

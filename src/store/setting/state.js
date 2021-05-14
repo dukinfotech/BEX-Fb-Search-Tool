@@ -6,6 +6,7 @@ export default function () {
     category: null,
     delay: 3000,
     ggSheetId: '',
-    ggSheetKey: null
+    ggSheetKey: null,
+    isToggle: true
   }
 }
