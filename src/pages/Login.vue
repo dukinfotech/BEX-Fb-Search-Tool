@@ -12,7 +12,6 @@
 
 <script>
 import axios from 'axios';
-const https = require('https');
 export default {
   data() {
     return {
@@ -42,13 +41,9 @@ export default {
           this.isRequesting = true;
 
           axios({
-            url: 'http://quasar.test/api/users/login',
+            url: 'https://www.quetpagefacebook.com/api/users/login',
             method: 'post',
-            headers: {
-              'Content-Type': 'application/json'
-            },
-            responseType: 'json',
-            httpsAgent: new https.Agent({ rejectUnauthorized: false })
+            data: {email: email, password: password}
           })
           .then(() => {
             this.$store.commit('running/setIsLoggedIn', true);

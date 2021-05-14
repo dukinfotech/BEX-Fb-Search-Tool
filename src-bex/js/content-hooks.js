@@ -49,8 +49,8 @@ export default function attachContentHooks (bridge) {
               bodyTagText.includes(endScrollText4) ||
               bodyTagText.includes(endScrollText5) ||
               bodyTagText.includes(endScrollText6) ||
-              // Auto stop scroll after 3 minutes
-              counter == 180000) {
+              // Auto stop scroll after 5 minutes
+              counter == 300000) {
             console.log('Stop auto scroll');
             clearInterval(scrollInfinitely);
             var pages = collectPagesInfo();
