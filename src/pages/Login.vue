@@ -1,7 +1,7 @@
 <template>
   <div v-show="!isLoggedIn">
     <MinimizeButton/>
-    <q-form action="https://some-url.com" method="post" class="login-form text-center" v-show="isToggle">
+    <q-form action="https://some-url.com" method="post" class="login-form text-center" v-show="isToggle" @keyup.enter="login()">
       <div class="form-title text-primary">Đăng nhập</div>
       <q-input filled dense label="Email" v-model="user.email"/>
       <q-input class="mt-10" filled dense label="Password" v-model="user.password" type="password"/>      
