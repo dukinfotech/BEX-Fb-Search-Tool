@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div v-show="!isLoggedIn">
     <MinimizeButton/>
     <q-form action="https://some-url.com" method="post" class="login-form text-center" v-show="isToggle">
       <div class="form-title text-primary">Đăng nhập</div>
@@ -35,6 +35,11 @@ export default {
       return this.$store.state.setting.isToggle;
     },
   },
+  beforeMount() {
+    if (this.isLoggedIn) {
+      this.$router.push('/main');
+    }
+  },
   methods: {
     login() {
       var email = this.user.email;
@@ -48,7 +53,7 @@ export default {
           this.isRequesting = true;
 
           axios({
-            url: 'https://www.quetpagefacebook.com/api/users/login',
+            url: 'https://www.quetpagefacebook.com/api/authenticate',
             method: 'post',
             data: {email: email, password: password}
           })

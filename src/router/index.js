@@ -25,17 +25,8 @@ export default function ({ store }) {
     mode: process.env.VUE_ROUTER_MODE,
     base: process.env.VUE_ROUTER_BASE
   })
-
-  Router.beforeEach((to, from, next) => {
-    store.dispatch('running/loadLoggedInStatus');
-    setTimeout(() => {
-      var isLoggedIn = store.state.running.isLoggedIn;
-      if (isLoggedIn) {
-        next({ name: 'main'});
-      }
-    }, 0);
-    next();
-  })
+  
+  store.dispatch('running/loadLoggedInStatus');
 
   return Router
   
