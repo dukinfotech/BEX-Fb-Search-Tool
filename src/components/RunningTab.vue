@@ -10,10 +10,10 @@
         :disabled="selectedLocations.length == 0 || currentLocationIndex == selectedLocations.length-1 || isRunning" @click="nextLocation()"/>
     </div>
     <q-select filled dense v-model="keyword" :options="keywords" label="Từ khóa" />
-    Running: {{ isRunning }}
+    <!-- Running: {{ isRunning }}
     Loading: {{ isSearching }}
     currentLocationIndex: {{ currentLocationIndex }}
-    currentKeywordIndex: {{ currentKeywordIndex }}
+    currentKeywordIndex: {{ currentKeywordIndex }} -->
     <div v-if="category && category.value">
       Lĩnh vực: {{ category.label }}
     </div>
@@ -131,8 +131,8 @@ export default {
   },
   methods: {
     start() {
-      var user = this.loggedUser;
-      axios.get(`https://www.quetpagefacebook.com/api/${user}/check-status`)
+      var userToken = this.loggedUser;
+      axios.get(`https://www.quetpagefacebook.com/api/check-status?token=${userToken}`)
       .then((res) => {
         if (res.data == 0) {
           return this.logout();
