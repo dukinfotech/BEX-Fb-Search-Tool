@@ -7,6 +7,7 @@ export default function () {
     isSearching: false,
     currentLocationIndex: 0,
     currentKeywordIndex: 0,
-    isLoggedIn: false
+    isLoggedIn: false,
+    loggedUser: null
   }
 }

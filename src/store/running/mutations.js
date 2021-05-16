@@ -45,6 +45,11 @@ export function setIsLoggedIn(state, status) {
   chrome.storage.local.set(state);
 }
 
+export function setLoggedUser(state, user) {
+  state.loggedUser = user
+  chrome.storage.local.set(state);
+}
+
 export function clearRunnings(state) {
   state.keyword = ''
   state.isRunning = false;
@@ -55,6 +60,7 @@ export function clearRunnings(state) {
   state.currentKeywordIndex = 0;
   state.currentKeywordIndex = 0;
   state.isLoggedIn = false;
+  state.loggedUser = null;
   chrome.storage.local.set(state);
 }
 

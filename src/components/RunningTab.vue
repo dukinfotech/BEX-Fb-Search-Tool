@@ -39,7 +39,7 @@
 import { transformFilter, makeURL } from 'app/src/helpers'
 import PageTable from './PageTable.vue'
 const { GoogleSpreadsheet } = require('google-spreadsheet');
-
+import axios from 'axios';
 export default {
   components: { PageTable },
   computed: {
@@ -75,6 +75,9 @@ export default {
     },
     currentKeywordIndex() {
       return this.$store.state.running.currentKeywordIndex;
+    },
+    loggedUser() {
+      return this.$store.state.running.loggedUser;
     },
     keyword: {
       get() {
@@ -124,28 +127,43 @@ export default {
   },
   methods: {
     start() {
-      if (this.pages.length > 0 && this.currentKeywordIndex == this.keywords.length && this.currentLocationIndex == this.selectedLocations.length) {
-        this.$store.commit('running/setRunning', true);
-        this.$store.commit('running/setIsSearching', true);
-        this.$q.bex.send('accessPage', { page: this.pages[this.pageIndex] });
-      } else {
-        if (!this.keyword) {
-          this.$q.notify('Bạn chưa chọn từ khóa')
-        } else {
-          this.$store.commit('running/setRunning', true);
-          var filters = [];
-          if (this.category && this.category.value) {
-            var categoryFilter = transformFilter('category', 'pages_category', this.category.value);
-            filters.push(categoryFilter);
-          }
-          if (this.selectedLocations.length > 0) {
-            var locationFilter = transformFilter('filter_pages_location', 'filter_pages_location', this.selectedLocations[this.currentLocationIndex].code);
-            filters.push(locationFilter);
-          }
-          var url = makeURL(filters, this.keywords[this.currentKeywordIndex]);
-          this.$q.bex.send('fb.redirect', { url: url });
+      var user = this.loggedUser;
+      axios.get(`https://www.quetpagefacebook.com/api/${user}/check-status`)
+      .then((res) => {
+        if (res.data == 0) {
+          return this.logout();
         }
-      }
+        if (this.pages.length > 0 && this.currentKeywordIndex == this.keywords.length && this.currentLocationIndex == this.selectedLocations.length) {
+          this.$store.commit('running/setRunning', true);
+          this.$store.commit('running/setIsSearching', true);
+          this.$q.bex.send('accessPage', { page: this.pages[this.pageIndex] });
+        } else {
+          if (!this.keyword) {
+            this.$q.notify('Bạn chưa chọn từ khóa')
+          } else {
+            this.$store.commit('running/setRunning', true);
+            var filters = [];
+            if (this.category && this.category.value) {
+              var categoryFilter = transformFilter('category', 'pages_category', this.category.value);
+              filters.push(categoryFilter);
+            }
+            if (this.selectedLocations.length > 0) {
+              var locationFilter = transformFilter('filter_pages_location', 'filter_pages_location', this.selectedLocations[this.currentLocationIndex].code);
+              filters.push(locationFilter);
+            }
+            var url = makeURL(filters, this.keywords[this.currentKeywordIndex]);
+            this.$q.bex.send('fb.redirect', { url: url });
+          }
+        }
+      })
+      .catch(() => {
+        return this.logout();
+      });
+    },
+    logout() {
+      this.$store.commit('running/clearRunnings')
+      this.$store.commit('setting/clearSettings')
+      this.$router.replace('/');
     },
     stop() {
       this.$store.commit('running/setRunning', false);

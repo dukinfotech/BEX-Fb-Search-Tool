@@ -11,7 +11,8 @@ export function loadRunningDataFromStorage (context) {
 }
 
 export function loadLoggedInStatus (context) {
-  chrome.storage.local.get(['isLoggedIn'], function(result) {
+  chrome.storage.local.get(['isLoggedIn', 'loggedUser'], function(result) {
     context.commit('setIsLoggedIn', result.isLoggedIn);
+    context.commit('setLoggedUser', result.loggedUser);
   });
 }

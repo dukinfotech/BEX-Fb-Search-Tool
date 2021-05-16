@@ -57,8 +57,9 @@ export default {
             method: 'post',
             data: {email: email, password: password}
           })
-          .then(() => {
+          .then((res) => {
             this.$store.commit('running/setIsLoggedIn', true);
+            this.$store.commit('running/setLoggedUser', res.data);
             this.$router.push('/main');
           })
           .catch(() => {
