@@ -10,8 +10,10 @@
         :disabled="selectedLocations.length == 0 || currentLocationIndex == selectedLocations.length-1 || isRunning" @click="nextLocation()"/>
     </div>
     <q-select filled dense v-model="keyword" :options="keywords" label="Từ khóa" />
-    <!-- Running: {{ isRunning }}
-    Loading: {{ isSearching }} -->
+    Running: {{ isRunning }}
+    Loading: {{ isSearching }}
+    currentLocationIndex: {{ currentLocationIndex }}
+    currentKeywordIndex: {{ currentKeywordIndex }}
     <div v-if="category && category.value">
       Lĩnh vực: {{ category.label }}
     </div>
@@ -97,31 +99,33 @@ export default {
   mounted() {
     // isSearching is status access to a page and search data
     setTimeout(async () => {
-      if (this.isSearching === false) {
-        // Lấy danh sách các pages tìm kiếm được
-        var { data } = await this.$q.bex.send('isRunning', { isRunning: this.isRunning });
-        if (data.length > 0) {  
-          this.$store.commit('running/mergePages', data);
-        }
-        this.nextLocation();
-        if (this.currentLocationIndex == this.selectedLocations.length) {
-          this.nextKeyword();
-          if (this.currentKeywordIndex < this.keywords.length) {
-            this.$store.commit('running/setCurrentLocationIndex', 0);
+      if (this.isRunning) {
+        if (this.isSearching === false) {
+          // Lấy danh sách các pages tìm kiếm được
+          var { data } = await this.$q.bex.send('isRunning', { isRunning: this.isRunning });
+          if (data.length > 0) {  
+            this.$store.commit('running/mergePages', data);
           }
-        }
-        if (this.currentKeywordIndex < this.keywords.length) {
-          this.start();
-        } else {
-          if (this.pages.length > 0) {
-            this.$store.commit('running/setIsSearching', true);
-            this.$q.bex.send('accessPage', { page: this.pages[this.pageIndex] });
+          this.nextLocation();
+          if (this.currentLocationIndex == this.selectedLocations.length) {
+            this.nextKeyword();
+            if (this.currentKeywordIndex < this.keywords.length - 1) {
+              this.$store.commit('running/setCurrentLocationIndex', 0);
+            }
+          }
+          if (this.currentKeywordIndex < this.keywords.length - 1) {
+            this.start();
           } else {
-            this.stop();
+            if (this.pages.length > 0) {
+              this.$store.commit('running/setIsSearching', true);
+              this.$q.bex.send('accessPage', { page: this.pages[this.pageIndex] });
+            } else {
+              this.stop();
+            }
           }
+        } else {
+          this.autoAccessPage();
         }
-      } else if (this.isRunning) {
-        this.autoAccessPage();
       }
     }, 0);
   },
