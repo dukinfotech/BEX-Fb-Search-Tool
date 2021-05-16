@@ -25,7 +25,7 @@ export default function ({ store }) {
     mode: process.env.VUE_ROUTER_MODE,
     base: process.env.VUE_ROUTER_BASE
   })
-  
+  store.dispatch('running/loadRunningDataFromStorage');
   store.dispatch('running/loadLoggedInStatus');
 
   return Router
