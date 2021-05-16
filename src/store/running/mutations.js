@@ -59,8 +59,6 @@ export function clearRunnings(state) {
   state.currentLocationIndex = 0;
   state.currentKeywordIndex = 0;
   state.currentKeywordIndex = 0;
-  state.isLoggedIn = false;
-  state.loggedUser = null;
   chrome.storage.local.set(state);
 }
 
