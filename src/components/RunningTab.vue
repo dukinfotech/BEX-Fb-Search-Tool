@@ -10,10 +10,10 @@
         :disabled="selectedLocations.length == 0 || currentLocationIndex == selectedLocations.length-1 || isRunning" @click="nextLocation()"/>
     </div>
     <q-select filled dense v-model="keyword" :options="keywords" label="Từ khóa" />
-    <!-- Running: {{ isRunning }}
-    Loading: {{ isSearching }}
-    currentLocationIndex: {{ currentLocationIndex }}
-    currentKeywordIndex: {{ currentKeywordIndex }} -->
+    <div>Running: {{ isRunning }}</div>
+    <div>Loading: {{ isSearching }}</div>
+    <div>currentLocationIndex: {{ currentLocationIndex }} / {{ selectedLocations.length }}</div>
+    <div>currentKeywordIndex: {{ currentKeywordIndex }} / {{ keywords.length }}</div>
     <div v-if="category && category.value">
       Lĩnh vực: {{ category.label }}
     </div>
@@ -113,7 +113,7 @@ export default {
               this.$store.commit('running/setCurrentLocationIndex', 0);
             }
           }
-          if (this.currentKeywordIndex < this.keywords.length - 1) {
+          if (this.currentKeywordIndex <= this.keywords.length - 1) {
             this.start();
           } else {
             if (this.pages.length > 0) {
