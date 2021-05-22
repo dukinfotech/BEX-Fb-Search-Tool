@@ -10,10 +10,10 @@
         :disabled="selectedLocations.length == 0 || currentLocationIndex == selectedLocations.length-1 || isRunning" @click="nextLocation()"/>
     </div>
     <q-select filled dense v-model="keyword" :options="keywords" label="Từ khóa" />
-    <div>Running: {{ isRunning }}</div>
+    <!-- <div>Running: {{ isRunning }}</div>
     <div>Loading: {{ isSearching }}</div>
-    <div>currentLocationIndex: {{ currentLocationIndex }} / {{ selectedLocations.length }}</div>
-    <div>currentKeywordIndex: {{ currentKeywordIndex }} / {{ keywords.length }}</div>
+    <div>currentLocationIndex: {{ currentLocationIndex }} / {{ selectedLocations.length - 1 }}</div>
+    <div>currentKeywordIndex: {{ currentKeywordIndex }} / {{ keywords.length - 1 }}</div> -->
     <div v-if="category && category.value">
       Lĩnh vực: {{ category.label }}
     </div>
@@ -106,25 +106,25 @@ export default {
           if (data.length > 0) {  
             this.$store.commit('running/mergePages', data);
           }
-          this.nextLocation();
-          if (this.currentLocationIndex == this.selectedLocations.length) {
-            this.nextKeyword();
-            if (this.currentKeywordIndex < this.keywords.length - 1) {
-              this.$store.commit('running/setCurrentLocationIndex', 0);
-            }
-          }
-          if (this.currentKeywordIndex <= this.keywords.length - 1) {
-            this.start();
-          } else {
-            if (this.pages.length > 0) {
-              this.$store.commit('running/setIsSearching', true);
-              this.$q.bex.send('accessPage', { page: this.pages[this.pageIndex] });
+
+          if (this.currentLocationIndex == this.selectedLocations.length - 1 || this.selectedLocations.length == 0) {
+            if (this.currentKeywordIndex == this.keywords.length - 1) {
+              if (this.pages.length > 0) {
+                this.accessPage(true);
+              } else {
+                this.stop(false);
+              }
             } else {
-              this.stop();
+              this.nextKeyword();
+              this.$store.commit('running/setCurrentLocationIndex', 0);
+              this.startSearching();
             }
+          } else {
+            this.nextLocation();
+            this.startSearching();
           }
         } else {
-          this.autoAccessPage();
+          this.getPageInfo();
         }
       }
     }, 0);
@@ -137,26 +137,17 @@ export default {
         if (res.data == 0) {
           return this.logout();
         }
-        if (this.pages.length > 0 && this.currentKeywordIndex == this.keywords.length && this.currentLocationIndex == this.selectedLocations.length) {
+        //  && this.currentKeywordIndex == this.keywords.length && this.currentLocationIndex == this.selectedLocations.length
+        if (this.pages.length > 0) {
           this.$store.commit('running/setRunning', true);
           this.$store.commit('running/setIsSearching', true);
-          this.$q.bex.send('accessPage', { page: this.pages[this.pageIndex] });
+          this.accessPage(false);
         } else {
           if (!this.keyword) {
             this.$q.notify('Bạn chưa chọn từ khóa')
           } else {
             this.$store.commit('running/setRunning', true);
-            var filters = [];
-            if (this.category && this.category.value) {
-              var categoryFilter = transformFilter('category', 'pages_category', this.category.value);
-              filters.push(categoryFilter);
-            }
-            if (this.selectedLocations.length > 0) {
-              var locationFilter = transformFilter('filter_pages_location', 'filter_pages_location', this.selectedLocations[this.currentLocationIndex].code);
-              filters.push(locationFilter);
-            }
-            var url = makeURL(filters, this.keywords[this.currentKeywordIndex]);
-            this.$q.bex.send('fb.redirect', { url: url });
+            this.startSearching();
           }
         }
       })
@@ -169,10 +160,20 @@ export default {
       this.$store.commit('setting/clearSettings')
       this.$router.replace('/');
     },
-    stop() {
-      this.$store.commit('running/setRunning', false);
-      this.$store.commit('running/setIsSearching', false);
-      this.$q.bex.send('isRunning', { isRunning: this.isRunning });
+    async stop(isCollectPages = true) {      
+      // Searching pages from keyword
+      if (this.isSearching == false && isCollectPages) {
+        var { data } = await this.$q.bex.send('collectPages');
+        // Save pages to storage
+        if (data.length > 0) {  
+          this.$store.commit('running/mergePages', data);
+          // Start access pages
+          this.accessPage(true);
+        }
+      } else {
+        this.$store.commit('running/setRunning', false);
+        this.$store.commit('running/setIsSearching', false); 
+      }
     },
     reset() {
       this.$store.commit('running/clearRunnings');
@@ -187,7 +188,26 @@ export default {
       this.$store.commit('running/setCurrentKeywordIndex', this.currentKeywordIndex+1);
       this.$store.commit('running/setKey', this.keywords[this.currentKeywordIndex]);
     },
-    autoAccessPage() {
+    accessPage(isFirstAccess = true) {
+      if (isFirstAccess) {
+        this.$store.commit('running/setIsSearching', true);
+      }
+      this.$q.bex.send('accessPage', { link: this.pages[this.pageIndex].link });
+    },
+    startSearching() {
+      var filters = [];
+      if (this.category && this.category.value) {
+        var categoryFilter = transformFilter('category', 'pages_category', this.category.value);
+        filters.push(categoryFilter);
+      }
+      if (this.selectedLocations.length > 0) {
+        var locationFilter = transformFilter('filter_pages_location', 'filter_pages_location', this.selectedLocations[this.currentLocationIndex].code);
+        filters.push(locationFilter);
+      }
+      var url = makeURL(filters, this.keywords[this.currentKeywordIndex]);
+      this.$q.bex.send('fb.redirect', { url: url });
+    },
+    getPageInfo() {
       // Truy cập vào từng trang web
       this.$q.bex.send('getPageInfo', { delay: this.delay }).then(async res => {
         var info = res.data;
@@ -196,7 +216,7 @@ export default {
         await this.writeToGGSheet(this.pages[this.pageIndex-1]);
         // Tiếp tục chạy link tiếp theo
         if (this.pages[this.pageIndex] != undefined) {
-          this.$q.bex.send('accessPage', { page: this.pages[this.pageIndex] });
+          this.accessPage(false);
         } else {
           this.$store.commit('running/setRunning', false);
           this.$store.commit('running/setIsSearching', false);
