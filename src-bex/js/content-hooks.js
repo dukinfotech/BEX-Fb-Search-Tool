@@ -94,13 +94,10 @@ export default function attachContentHooks (bridge) {
       await wait(payload.delay + randomSeconds[randomIndex]);
       var firstPostCard = document.body.querySelector('div[aria-posinset="1"]');
       if (firstPostCard) {
-        var spanTags = firstPostCard.querySelectorAll('a.b1v8xokw')[0].querySelectorAll('span');
-        for (let i = 0; i < spanTags.length; i++) {
-          if (spanTags[i].style.position == '') {
-            var textContent = spanTags[i].textContent;
-            if (textContent.length == 1) {
-              page.firstPostTime += textContent;
-            }
+        var bTags = firstPostCard.querySelectorAll('b');
+        for (let i = 0; i < bTags.length; i++) {
+          if (bTags[i].style.display != 'none' && bTags[i].childElementCount == 0) {
+            page.firstPostTime = bTags[i].textContent;
           }
         }
 
