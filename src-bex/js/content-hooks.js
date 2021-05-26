@@ -95,11 +95,7 @@ export default function attachContentHooks (bridge) {
       var firstPostCard = document.body.querySelector('div[aria-posinset="1"]');
       if (firstPostCard) {
         var bTags = firstPostCard.querySelectorAll('b');
-        for (let i = 0; i < bTags.length; i++) {
-          if (bTags[i].style.display != 'none' && bTags[i].childElementCount == 0) {
-            page.firstPostTime = bTags[i].textContent;
-          }
-        }
+        page.firstPostTime = bTags[0].innerText
 
         // Get page name
         page.name = firstPostCard.querySelector('strong').textContent
